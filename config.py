@@ -9,6 +9,12 @@ class Config(object):
 
     SECRET_KEY = 'some_secret_key'
 
+    # Database configs
+    DB_HOST = 'localhost'
+    DB_USER = 'root'
+    DB_PASSWD = '1234'
+    DB_NAME = 'testperson'
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
