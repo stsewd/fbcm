@@ -4,6 +4,6 @@ from . import db
 
 
 class Person(db.Entity):
-    pid = orm.Required(str)
-    name = orm.Required(str)
-    lastname = orm.Required(str)
+    pid = orm.PrimaryKey(str, 10)
+    name = orm.Required(str, 40)
+    lastname = orm.Required(str, 40)
