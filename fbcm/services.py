@@ -1,6 +1,6 @@
 from pony.orm import db_session
 
-from .models import Player, Person
+from .models import Player
 
 
 class FbcmError(Exception):
@@ -20,33 +20,35 @@ class FbcmError(Exception):
 
 
 @db_session
-def person_exist(id):
-    return Person.exists(id=id)
+def player_exists(id):
+    return Player.exists(id=id)
 
 
 def clean_kwargs(kwargs):
     for k, v in kwargs.items():
-        kwargs[k] = v.strip()
+        kwargs[k] = v.strip() if isinstance(v, str) else v
 
 
-def check_attr_alpha(kwargs, k, name):
+def check_attr_alpha(attr, name):
     error = ""
-    if k not in kwargs or not kwargs[k]:
+    attr = attr.strip()
+    if not attr:
         error = "Atributo {name} faltante."
-    elif not kwargs[k].replace(" ", "").strip().isalpha():
+    elif not attr.replace(" ", "").isalpha():
         error = "El atributo {name} contiene caracteres no válidos"
 
     if error:
         raise FbcmError(error.format(name=name))
 
 
-def check_attr_person_id(kwargs, k='id', name='id'):
+def check_attr_person_id(id, name='id'):
     error = ""
-    if k not in kwargs:
+    id = id.strip()
+    if not id:
         error = "Atributo {name} faltante."
-    elif not kwargs.get(k, "").strip().isdigit():
+    elif not id.isdigit():
         error = "El {name} debe contener sólo números."
-    elif len(kwargs.get(k)) != 10:
+    elif len(id) != 10:
         error = "El {name} debe tener 10 dígitos."
 
     if error:
@@ -56,11 +58,11 @@ def check_attr_person_id(kwargs, k='id', name='id'):
 @db_session
 def add_player(**kwargs):
     clean_kwargs(kwargs)
-    check_attr_person_id(kwargs)
-    if person_exist(kwargs.get('id')):
+    check_attr_person_id(kwargs.get('id'))
+    if player_exists(kwargs.get('id')):
         raise FbcmError('El jugador ya existe.')
-    check_attr_alpha(kwargs, 'name', 'nombre')
-    check_attr_alpha(kwargs, 'lastname', 'apellido')
+    check_attr_alpha(kwargs.get('name'), 'nombre')
+    check_attr_alpha(kwargs.get('lastname'), 'apellido')
     try:
         Player(**kwargs)
     except Exception as e:
@@ -70,6 +72,6 @@ def add_player(**kwargs):
 
 @db_session
 def get_player(id):
-    if not person_exist(id):
+    if not player_exists(id):
         raise FbcmError('El jugador no existe.')
     return Player[id]
