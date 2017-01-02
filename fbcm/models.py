@@ -92,5 +92,4 @@ db.bind(
     passwd=app.config['DB_PASSWD'],
     db=app.config['DB_NAME']
 )
-orm.sql_debug(app.config['DEBUG'])
 db.generate_mapping(create_tables=True)
