@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block body %}
+{{ super() }}
+
+{# Add new player #}
+<form id="form-add-player">
+    <div class="form-group">
+        <label for="input-id">ID</label>
+        <input class="form-control" type="text" id="input-id" name="id">
+    </div>
+    <div class="form-group">
+        <label for="input-name">Nombre</label>
+        <input id="input-name" class="form-control" type="text" name="name">
+    </div>
+    <div class="form-group">
+        <label for="input-lastname">Apellido</label>
+        <input id="input-lastname" class="form-control" type="text" name="lastname">
+    </div>
+    <button type="submit" class="btn btn-primary">Agregar</button>
+</form>
+{% endblock %}
