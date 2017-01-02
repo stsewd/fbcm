@@ -6,22 +6,6 @@ from . import app
 db = orm.Database()
 
 
-class FbcmError(Exception):
-    def __init__(self, msg, status_code=None):
-        Exception.__init__(self, msg)
-        self.msg = msg
-        self.status_code = status_code if status_code is not None else 200
-
-    def to_dict(self):
-        return {
-            'description': self.msg,
-            'status': 'error'
-        }
-
-    def __str__(self):
-        return self.msg
-
-
 class Person(db.Entity):
     id = orm.PrimaryKey(str, 10)
     name = orm.Required(str, 40)
