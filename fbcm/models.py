@@ -1,6 +1,25 @@
 from pony import orm
 
-from . import db
+from . import app
+
+
+db = orm.Database()
+
+
+class FbcmError(Exception):
+    def __init__(self, msg, status_code=None):
+        Exception.__init__(self, msg)
+        self.msg = msg
+        self.status_code = status_code if status_code is not None else 200
+
+    def to_dict(self):
+        return {
+            'description': self.msg,
+            'status': 'error'
+        }
+
+    def __str__(self):
+        return self.msg
 
 
 class Person(db.Entity):
@@ -10,9 +29,9 @@ class Person(db.Entity):
 
 
 class Player(Person):
-    team = orm.Required('Team')
-    position = orm.Required(str)
-    number = orm.Required(int, unique=True)
+    team = orm.Optional('Team')
+    position = orm.Optional(str)
+    number = orm.Optional(int, unique=True)
     goals = orm.Set('Goal')
 
 
@@ -80,3 +99,14 @@ class TeamChampionship(db.Entity):
     championship = orm.Required(Championship)
     matches = orm.Set(TeamMatch)
     orm.PrimaryKey(team, championship)
+
+
+db.bind(
+    'mysql',
+    host=app.config['DB_HOST'],
+    user=app.config['DB_USER'],
+    passwd=app.config['DB_PASSWD'],
+    db=app.config['DB_NAME']
+)
+orm.sql_debug(app.config['DEBUG'])
+db.generate_mapping(create_tables=True)
