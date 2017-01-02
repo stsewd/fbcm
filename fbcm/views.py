@@ -26,14 +26,12 @@ def players(player):
 
 @app.route('/players/new', methods=['POST'])
 def add_player():
-    id = request.form['id']
-    name = request.form['name']
-    lastname = request.form['lastname']
-    srv.add_player(
-        id=id,
-        name=name,
-        lastname=lastname
-    )
+    form = {
+        k: v
+        for k, v in request.form.items()
+        if k in {'name', 'lastname', 'id'}
+    }
+    srv.add_player(**form)
     return redirect(url_for('players'))
 
 

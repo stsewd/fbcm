@@ -31,7 +31,7 @@ def clean_kwargs(kwargs):
 
 def check_attr_alpha(kwargs, k, name):
     error = ""
-    if k not in kwargs:
+    if k not in kwargs or not kwargs[k]:
         error = "Atributo {name} faltante."
     elif not kwargs[k].replace(" ", "").strip().isalpha():
         error = "El atributo {name} contiene caracteres no válidos"
@@ -66,3 +66,10 @@ def add_player(**kwargs):
     except Exception as e:
         print(type(e))
         raise FbcmError(str(e))
+
+
+@db_session
+def get_player(id):
+    if not person_exist(id):
+        raise FbcmError('El jugador no existe.')
+    return Player[id]

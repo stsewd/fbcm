@@ -2,6 +2,7 @@ from flask_testing import TestCase
 from pony import orm
 
 from fbcm import app
+from fbcm.models import db
 
 
 class BaseTestCase(TestCase):
@@ -10,8 +11,8 @@ class BaseTestCase(TestCase):
         return app
 
     def setUp(self):
+        db.create_tables()
         orm.sql_debug(self.app.config['DEBUG'])
 
     def tearDown(self):
-        from fbcm.models import db
         db.drop_all_tables(with_all_data=True)
