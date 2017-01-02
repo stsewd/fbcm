@@ -12,12 +12,5 @@ def server():
     app.run(debug=True)
 
 
-@cli.command()
-def initdb():
-    from fbcm import db
-    from fbcm import models
-    db.generate_mapping(create_tables=True)
-
-
 if __name__ == "__main__":
     cli()
