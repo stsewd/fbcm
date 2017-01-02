@@ -1,3 +1,5 @@
+/*jshint esversion: 6 */
+
 function createAlert(type, msg) {
     var icon = type === 'alert-success' ? 'glyphicon-ok' : 'glyphicon-warning-sign';
     var alertBootstrap = $('<div>', {
