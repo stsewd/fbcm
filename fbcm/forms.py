@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from .models import Player
+from .models import Player, Team
 
 
 def only_alpha(form, field):
@@ -48,3 +48,23 @@ class PlayerForm(FlaskForm):
     @db_session
     def _player_exists(id):
         return Player.exists(id=id)
+
+
+class TeamForm(FlaskForm):
+    name = StringField('Nombre', validators=[
+        DataRequired(message="Nombre faltante."),
+        Length(max=90, message="Nombre demasiado largo.")
+    ])
+
+    def validate_name(form, field):
+        error = ""
+        name = field.data
+        if TeamForm._team_exists(name):
+            error = "El nombre ya está ocupado."
+        if error:
+            raise ValidationError(error)
+
+    @staticmethod
+    @db_session
+    def _team_exists(name):
+        return Team.exists(name=name)

@@ -8,8 +8,8 @@ from flask import (
 )
 
 from . import app
-from .models import FbcmError, Player
-from .forms import PlayerForm
+from .models import FbcmError, Player, Team
+from .forms import PlayerForm, TeamForm
 
 
 def get_first_error(form):
@@ -50,6 +50,38 @@ def add_player():
         return redirect(url_for('players'))  # TODO: redirect to player?
     else:
         raise FbcmError(get_first_error(form))
+
+
+@app.route('/teams/', defaults={'id': None})
+@app.route('/teams/<id>')
+def teams(id):
+    if id:
+        return "Team: {}".format(id)
+    else:
+        with db_session:
+            teams = Team.select()
+            form = TeamForm(csrf_enabled=False)
+            return render_template('teams.html', teams=teams, form=form)
+
+
+@app.route('/teams/new', methods=['POST'])
+def add_team():
+    form = TeamForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        with db_session:
+            Team(**form.data)
+        return redirect(url_for('teams'))
+    else:
+        raise FbcmError(get_first_error(form))
+
+
+@app.route('/championships/', defaults={'id': None})
+@app.route('/championships/<id>')
+def championships(id):
+    if id:
+        return "Championship: {}".format(id)
+    else:
+        return render_template('championships.html', championships=None)
 
 
 @app.errorhandler(FbcmError)

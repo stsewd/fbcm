@@ -8,11 +8,11 @@ function createAlert(type, msg) {
         'hidden': 'hidden',
         'html': `
             <button type="button" class="close" data-dismiss="alert">
-                <span>&times;</span>
+            <span>&times;</span>
             </button>
             <span class="alert-message">
-                <span class="glyphicon ${icon} text-muted"></span> ${msg}
-            </span>`
+            <span class="glyphicon ${icon} text-muted"></span> ${msg}
+        </span>`
     });
     $('#container-alert').append(alertBootstrap);
     return alertBootstrap;
@@ -55,4 +55,8 @@ function sendRequest(form, method, url, success) {
 
 sendRequest('#form-add-player', 'POST', '/players/new', function (data, status) {
     showAlert('alert-success', 'Jugador agregado.');
+});
+
+sendRequest('#form-add-team', 'POST', '/teams/new', function (data, status) {
+    showAlert('alert-success', 'Equipo agregado.');
 });
