@@ -1,3 +1,4 @@
+{% import "macros.html" as macros %}
 {% extends "layout.html" %}
 
 {% block body %}
@@ -31,14 +32,6 @@
 </table>
 
 <h2>Nuevo Jugador</h2>
-
-<form id="form-add-player">
-    {% for field in form if field.name not in "csrf_token" %}
-        <div class="form-group">
-            {{ field.label }} {{ field(class="form-control", required="required") }}
-        </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">Agregar</button>
-</form>
+{{ macros.make_form(form, 'form-add-player') }}
 
 {% endblock %}
