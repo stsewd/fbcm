@@ -12,6 +12,13 @@ from .models import FbcmError, Player
 from .forms import PlayerForm
 
 
+def get_first_error(form):
+    if form.errors:
+        return list(form.errors.values())[0][0]
+    else:
+        return ""
+
+
 @app.route('/')
 def index():
     return redirect(url_for('players'))
@@ -28,8 +35,10 @@ def players(id):
             else:
                 abort(404)
     else:
-        form = PlayerForm(csrf_enabled=False)
-        return render_template('players.html', form=form)
+        with db_session:
+            players = Player.select()
+            form = PlayerForm(csrf_enabled=False)
+            return render_template('players.html', players=players, form=form)
 
 
 @app.route('/players/new', methods=['POST'])
@@ -38,9 +47,9 @@ def add_player():
     if form.validate_on_submit():
         with db_session:
             Player(**form.data)
-        return redirect(url_for('players'))  # TODO: redirect to player
+        return redirect(url_for('players'))  # TODO: redirect to player?
     else:
-        raise FbcmError(list(form.errors.values())[0][0])
+        raise FbcmError(get_first_error(form))
 
 
 @app.errorhandler(FbcmError)

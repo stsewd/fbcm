@@ -2,7 +2,35 @@
 
 {% block body %}
 
-<h2>Agregar nuevo jugador</h2>
+<h1>Jugadores</h1>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Equipo</th>
+      <th>Posición</th>
+      <th>Número</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for player in players %}
+    <tr>
+      <td>
+          <a href="{{ url_for('players', id=player.id) }}">{{ player.id }}</a>
+      </td>
+      <td>{{ player.name }}</td>
+      <td>{{ player.lastname }}</td>
+      <td>{{ player.team.name or "-" }}</td>
+      <td>{{ player.position or "-" }}</td>
+      <td>{{ player.number if player.number is defined else "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Nuevo Jugador</h2>
 
 <form id="form-add-player">
     {% for field in form if field.name not in "csrf_token" %}

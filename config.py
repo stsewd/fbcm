@@ -13,7 +13,7 @@ class Config(object):
     DB_HOST = 'localhost'
     DB_USER = 'root'
     DB_PASSWD = '1234'
-    DB_NAME = 'testperson'
+    DB_NAME = 'fbcm'
 
 
 class DevelopmentConfig(Config):
@@ -22,3 +22,4 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     TESTING = True
+    DB_NAME = 'fbcm_testing'
