@@ -1,5 +1,6 @@
 from pony.orm import db_session
 from flask import (
+    abort,
     jsonify,
     redirect,
     render_template,
@@ -16,11 +17,16 @@ def index():
     return redirect(url_for('players'))
 
 
-@app.route('/players/', defaults={'player': None})
-@app.route('/players/<player>')
-def players(player):
-    if player:
-        pass
+@app.route('/players/', defaults={'id': None})
+@app.route('/players/<id>')
+def players(id):
+    if id:
+        with db_session:
+            player = Player.get(id=id)
+            if player:
+                return render_template('player.html', player=player)
+            else:
+                abort(404)
     else:
         form = PlayerForm(csrf_enabled=False)
         return render_template('players.html', form=form)

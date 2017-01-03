@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<table class="table">
+    <tr>
+      <th scope="row">ID</th>
+      <td>{{ player.id }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Nombre</th>
+      <td>{{ player.name }}</td>
+    </tr>
+    <tr>
+      <th scope="row">Apellido</th>
+      <td>{{ player.lastname }}</td>
+    </tr>
+    {% if player.team %}
+    <tr>
+      <th scope="row">Equipo</th>
+      <td>
+          {{ player.team.name }}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Posición</th>
+      <td>
+          {{ player.position }}
+      </td>
+    </tr>
+    <tr>
+      <th scope="row">Número</th>
+      <td>
+          {{ player.number }}
+      </td>
+    </tr>
+    {% endif %}
+</table>
+{% endblock %}
