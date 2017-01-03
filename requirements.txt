@@ -3,3 +3,4 @@ pony
 PyMySQL
 Flask-Testing
 Flask-WTF
+Faker

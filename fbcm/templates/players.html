@@ -24,7 +24,7 @@
       <td>{{ player.lastname }}</td>
       <td>{{ player.team.name or "-" }}</td>
       <td>{{ player.position or "-" }}</td>
-      <td>{{ player.number if player.number is defined else "-" }}</td>
+      <td>{{ player.number if player.number != None else "-" }}</td>
     </tr>
     {% endfor %}
   </tbody>
