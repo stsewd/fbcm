@@ -1,13 +1,14 @@
+from pony.orm import db_session
 from flask import (
+    jsonify,
     redirect,
     render_template,
-    url_for,
-    request,
-    jsonify
+    url_for
 )
 
 from . import app
-from . import services as srv
+from .models import FbcmError, Player
+from .forms import PlayerForm
 
 
 @app.route('/')
@@ -19,22 +20,24 @@ def index():
 @app.route('/players/<player>')
 def players(player):
     if player:
-        return render_template('players.html')
+        pass
     else:
-        return render_template('players.html')
+        form = PlayerForm(csrf_enabled=False)
+        return render_template('players.html', form=form)
 
 
 @app.route('/players/new', methods=['POST'])
 def add_player():
-    form = {
-        k: request.form.get(k, "")
-        for k in ('id', 'name', 'lastname')
-    }
-    srv.add_player(**form)
-    return redirect(url_for('players'))
+    form = PlayerForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        with db_session:
+            Player(**form.data)
+        return redirect(url_for('players'))  # TODO: redirect to player
+    else:
+        raise FbcmError(list(form.errors.values())[0][0])
 
 
-@app.errorhandler(srv.FbcmError)
+@app.errorhandler(FbcmError)
 def fbcm_error_handler(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code

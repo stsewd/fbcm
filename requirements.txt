@@ -2,3 +2,4 @@ flask
 pony
 PyMySQL
 Flask-Testing
+Flask-WTF
