@@ -1,7 +1,8 @@
+from pony.orm import db_session
 from flask import url_for
 
+from fbcm.models import Player
 from .test_base import BaseTestCase
-import fbcm.services as srv
 
 
 class PlayerViewsTests(BaseTestCase):
@@ -9,6 +10,10 @@ class PlayerViewsTests(BaseTestCase):
         self.assertEqual(p.id, kwargs['id'])
         self.assertEqual(p.name, kwargs['name'])
         self.assertEqual(p.lastname, kwargs['lastname'])
+
+    @db_session
+    def _get_player(self, id):
+        return Player[id]
 
     def test_create_player(self):
         id = '1234567890'
@@ -25,7 +30,7 @@ class PlayerViewsTests(BaseTestCase):
         )
 
         self.assertEqualPlayer(
-            srv.get_player(id),
+            self._get_player(id),
             id=id,
             name=name,
             lastname=lastname
@@ -72,4 +77,4 @@ class PlayerViewsTests(BaseTestCase):
             }
         )
         self.assertIn('error', response.json['status'])
-        self.assertIn('nombre', response.json['description'])
+        self.assertIn('faltante', response.json['description'])
