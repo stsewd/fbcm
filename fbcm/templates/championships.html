@@ -5,7 +5,30 @@
 
 {% block body %}
 <h1>Campeonatos</h1>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nombre</th>
+      <th>Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for championship in championships %}
+    <tr>
+      <td scope="row">
+        {{ loop.index }}
+      </td>
+      <td>
+        <a href="{{ url_for('championships', id=championship.id) }}">{{ championship.name }}</a>
+      </td>
+      <td>estado</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 <h2>Nuevo Campeonato</h2>
+{{ macros.make_form(form, 'form-add-championship') }}
 
 {% endblock %}

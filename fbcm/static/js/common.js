@@ -60,3 +60,7 @@ sendRequest('#form-add-player', 'POST', '/players/new', function (data, status) 
 sendRequest('#form-add-team', 'POST', '/teams/new', function (data, status) {
     showAlert('alert-success', 'Equipo agregado.');
 });
+
+sendRequest('#form-add-championship', 'POST', '/championships/new', function (data, status) {
+    showAlert('alert-success', 'Campeonato agregado.');
+});

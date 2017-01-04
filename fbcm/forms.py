@@ -1,9 +1,9 @@
 from pony.orm import db_session
 from flask_wtf import FlaskForm
-from wtforms import StringField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from .models import Player, Team
+from .models import Player, Team, Championship
 
 
 def only_alpha(form, field):
@@ -68,3 +68,26 @@ class TeamForm(FlaskForm):
     @db_session
     def _team_exists(name):
         return Team.exists(name=name)
+
+
+class ChampionshipForm(FlaskForm):
+    name = StringField('Nombre', validators=[
+        DataRequired(message="Nombre faltante."),
+        Length(max=90, message="Nombre demasiado largo.")
+    ])
+    description = TextAreaField('Descripción', validators=[
+        Length(max=500, message="Descripción demasiada larga.")
+    ])
+
+    def validate_name(form, field):
+        error = ""
+        name = field.data
+        if ChampionshipForm._championship_exists(name):
+            error = "El nombre ya está ocupado."
+        if error:
+            raise ValidationError(error)
+
+    @staticmethod
+    @db_session
+    def _championship_exists(name):
+        return Championship.exists(name=name)

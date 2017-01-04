@@ -8,8 +8,8 @@ from flask import (
 )
 
 from . import app
-from .models import FbcmError, Player, Team
-from .forms import PlayerForm, TeamForm
+from .models import FbcmError, Player, Team, Championship
+from .forms import PlayerForm, TeamForm, ChampionshipForm
 
 
 def get_first_error(form):
@@ -81,7 +81,30 @@ def championships(id):
     if id:
         return "Championship: {}".format(id)
     else:
-        return render_template('championships.html', championships=None)
+        with db_session:
+            championships = Championship.select()
+            form = ChampionshipForm(csrf_enabled=False)
+            return render_template(
+                'championships.html',
+                championships=championships,
+                form=form
+            )
+
+
+@app.route('/championships/new', methods=['POST'])
+def add_championship():
+    form = ChampionshipForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        with db_session:
+            Championship(
+                **form.data,
+                points_winner=2,
+                points_draw=1,
+                points_loser=0
+            )
+        return redirect(url_for('championships'))
+    else:
+        raise FbcmError(get_first_error(form))
 
 
 @app.errorhandler(FbcmError)

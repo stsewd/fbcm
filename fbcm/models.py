@@ -44,7 +44,7 @@ class Team(db.Entity):
 
 class Championship(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
-    name = orm.Required(str, unique=True)
+    name = orm.Required(str, 90, unique=True)
     description = orm.Optional(str, 500)
     teams = orm.Set('TeamChampionship')
     stages = orm.Set('Stage')  # Only four
