@@ -8,6 +8,7 @@
 <table class="table table-striped table-hover">
   <thead>
     <tr>
+      <th>#</th>
       <th>ID</th>
       <th>Nombre</th>
       <th>Apellido</th>
@@ -19,6 +20,9 @@
   <tbody>
     {% for player in players %}
     <tr>
+      <td scope="row">
+        {{ loop.index }}
+      </td>
       <td>
           <a href="{{ url_for('players', id=player.id) }}">{{ player.id }}</a>
       </td>
