@@ -26,27 +26,26 @@ def index():
 
 @app.route('/players/', defaults={'id': None})
 @app.route('/players/<id>')
+@db_session
 def players(id):
     if id:
-        with db_session:
-            player = Player.get(id=id)
-            if player:
-                return render_template('player.html', player=player)
-            else:
-                abort(404)
+        player = Player.get(id=id)
+        if player:
+            return render_template('player.html', player=player)
+        else:
+            abort(404)
     else:
-        with db_session:
-            players = Player.select()
-            form = PlayerForm(csrf_enabled=False)
-            return render_template('players.html', players=players, form=form)
+        players = Player.select()
+        form = PlayerForm(csrf_enabled=False)
+        return render_template('players.html', players=players, form=form)
 
 
 @app.route('/players/new', methods=['POST'])
+@db_session
 def add_player():
     form = PlayerForm(csrf_enabled=False)
     if form.validate_on_submit():
-        with db_session:
-            Player(**form.data)
+        Player(**form.data)
         return redirect(url_for('players'))  # TODO: redirect to player?
     else:
         raise FbcmError(get_first_error(form))
@@ -54,22 +53,26 @@ def add_player():
 
 @app.route('/teams/', defaults={'id': None})
 @app.route('/teams/<id>')
+@db_session
 def teams(id):
     if id:
-        return "Team: {}".format(id)
+        team = Team.get(id=id)
+        if team:
+            return render_template('team.html', team=team)
+        else:
+            abort(404)
     else:
-        with db_session:
-            teams = Team.select()
-            form = TeamForm(csrf_enabled=False)
-            return render_template('teams.html', teams=teams, form=form)
+        teams = Team.select()
+        form = TeamForm(csrf_enabled=False)
+        return render_template('teams.html', teams=teams, form=form)
 
 
 @app.route('/teams/new', methods=['POST'])
+@db_session
 def add_team():
     form = TeamForm(csrf_enabled=False)
     if form.validate_on_submit():
-        with db_session:
-            Team(**form.data)
+        Team(**form.data)
         return redirect(url_for('teams'))
     else:
         raise FbcmError(get_first_error(form))
@@ -77,31 +80,31 @@ def add_team():
 
 @app.route('/championships/', defaults={'id': None})
 @app.route('/championships/<id>')
+@db_session
 def championships(id):
     if id:
         return "Championship: {}".format(id)
     else:
-        with db_session:
-            championships = Championship.select()
-            form = ChampionshipForm(csrf_enabled=False)
-            return render_template(
-                'championships.html',
-                championships=championships,
-                form=form
-            )
+        championships = Championship.select()
+        form = ChampionshipForm(csrf_enabled=False)
+        return render_template(
+            'championships.html',
+            championships=championships,
+            form=form
+        )
 
 
 @app.route('/championships/new', methods=['POST'])
+@db_session
 def add_championship():
     form = ChampionshipForm(csrf_enabled=False)
     if form.validate_on_submit():
-        with db_session:
-            Championship(
-                **form.data,
-                points_winner=2,
-                points_draw=1,
-                points_loser=0
-            )
+        Championship(
+            **form.data,
+            points_winner=2,
+            points_draw=1,
+            points_loser=0
+        )
         return redirect(url_for('championships'))
     else:
         raise FbcmError(get_first_error(form))
