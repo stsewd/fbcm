@@ -1,12 +1,12 @@
 {% macro make_form(form, id, submit="Agregar", excludes=['csrf_token']) -%}
 <form id="{{ id }}">
-    {% for field in form if field.name not in excludes %}
-    <div class="form-group">
-      {{ field.label }} {{ field(class="form-control", required="required") }}
-    </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">{{ submit }}</button>
-  </form>
+  {% for field in form if field.name not in excludes %}
+  <div class="form-group">
+    {{ field.label }} {{ field(class="form-control", required="required") }}
+  </div>
+  {% endfor %}
+  <button type="submit" class="btn btn-primary">{{ submit }}</button>
+</form>
 {%- endmacro %}
 
 
