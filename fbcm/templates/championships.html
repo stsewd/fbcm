@@ -1,7 +1,12 @@
 {% import "macros.html" as macros %}
 {% extends "layout.html" %}
 
+
 {% block title %}Campeonatos{% endblock %}
+
+
+{% set form_id = 'form-add-championship' %}
+
 
 {% block body %}
 <h1>Campeonatos</h1>
@@ -20,7 +25,9 @@
         {{ loop.index }}
       </td>
       <td>
-        <a href="{{ url_for('championships', id=championship.id) }}">{{ championship.name }}</a>
+        <a href="{{ url_for('championships', id=championship.id) }}">
+          {{ championship.name }}
+        </a>
       </td>
       <td>estado</td>
     </tr>
@@ -29,6 +36,12 @@
 </table>
 
 <h2>Nuevo Campeonato</h2>
-{{ macros.make_form(form, 'form-add-championship') }}
+{{ macros.make_form(form, form_id) }}
 
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+{{ macros.js_send_request(form_id, url_for('add_championship'), "Campeonato agregado.") }}
 {% endblock %}

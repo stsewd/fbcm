@@ -1,7 +1,12 @@
 {% import "macros.html" as macros %}
 {% extends "layout.html" %}
 
+
 {% block title %}Equipos{% endblock %}
+
+
+{% set form_id = 'form-add-team' %}
+
 
 {% block body %}
 <h1>Equipos</h1>
@@ -19,7 +24,9 @@
         {{ loop.index }}
       </td>
       <td>
-          <a href="{{ url_for('teams', id=team.id) }}">{{ team.name }}</a>
+        <a href="{{ url_for('teams', id=team.id) }}">
+          {{ team.name }}
+        </a>
       </td>
     </tr>
     {% endfor %}
@@ -27,6 +34,12 @@
 </table>
 
 <h2>Nuevo Equipo</h2>
-{{ macros.make_form(form, 'form-add-team') }}
+{{ macros.make_form(form, form_id) }}
 
+{% endblock %}
+
+
+{% block scripts %}
+{{ super() }}
+{{ macros.js_send_request(form_id, url_for('add_team'), "Equipo agregado.") }}
 {% endblock %}

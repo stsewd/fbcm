@@ -8,3 +8,12 @@
     <button type="submit" class="btn btn-primary">{{ submit }}</button>
   </form>
 {%- endmacro %}
+
+
+{% macro js_send_request(form_id, url, message) -%}
+<script>
+  sendRequest('#{{ form_id }}', 'POST', '{{ url }}', function (data, status) {
+    showAlert('alert-success', '{{ message }}');
+  });
+</script>
+{%- endmacro %}
