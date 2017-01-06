@@ -42,6 +42,5 @@
 
 
 {% block scripts %}
-{{ super() }}
 {{ macros.js_send_request(form_id, url_for('add_championship'), "Campeonato agregado.") }}
 {% endblock %}

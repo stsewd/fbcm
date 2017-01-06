@@ -14,6 +14,7 @@
 <script>
   sendRequest('#{{ form_id }}', 'POST', '{{ url }}', function (data, status) {
     showAlert('alert-success', '{{ message }}');
+    $.pjax.reload('#main-content');
   });
 </script>
 {%- endmacro %}

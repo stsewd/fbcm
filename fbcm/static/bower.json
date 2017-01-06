@@ -1,0 +1,20 @@
+{
+  "name": "fbcm",
+  "homepage": "https://github.com/stsewd/fbcm",
+  "authors": [
+    "Santos Gallegos <santos_g@outlook.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery-pjax": "^1.9.6"
+  }
+}

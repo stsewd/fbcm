@@ -1,18 +1,25 @@
+{% if "X-PJAX" not in request.headers %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
+{% endif %}
     {% block head %}
+{% if "X-PJAX" not in request.headers %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+{% endif %}
 
     <title>{% block title %}Football Championship Manager{% endblock %} - FBCM</title>
 
+{% if "X-PJAX" not in request.headers %}
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" type="text/css"/>
+{% endif %}
     {% endblock %}
+{% if "X-PJAX" not in request.headers %}
   </head>
 
   <body>
@@ -44,18 +51,24 @@
             </ul>
           </nav>
         </div>
-        <div class="col-sm-9">
+        <div class="col-sm-9" id="main-content">
+{% endif %}
           {% block body %}
           <h1>Hello, world!</h1>
           {% endblock %}
+{% if "X-PJAX" not in request.headers %}
         </div>
       </div>
     </div>
 
-    {% block scripts %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="{{ url_for('static', filename='bower_components/jquery-pjax/jquery.pjax.js') }}"></script>
     <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+{% endif %}
+    {% block scripts %}
     {% endblock %}
+{% if "X-PJAX" not in request.headers %}
   </body>
 </html>
+{% endif %}
