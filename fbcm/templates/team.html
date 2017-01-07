@@ -1,0 +1,47 @@
+{% extends "layout.html"%}
+{% import "macros.html" as macros %}
+
+{% block title %}{{ team.name }}{% endblock %}
+
+{% set form_id = "form-add-player-to-team" %}
+
+{% block body %}
+<h1>{{ team.name }}</h1>
+<h2>Jugadores</h2>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>ID</th>
+      <th>Nombre</th>
+      <th>Apellido</th>
+      <th>Posición</th>
+      <th>Número</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for player in team.players %}
+    <tr>
+      <td scope="row">
+        {{ loop.index }}
+      </td>
+      <td>
+        <a href="{{ url_for('players', id=player.id) }}">{{ player.id }}</a>
+      </td>
+      <td>{{ player.name }}</td>
+      <td>{{ player.lastname }}</td>
+      <td>{{ player.position or "-" }}</td>
+      <td>{{ player.number if player.number != None else "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Agregar Jugador</h2>
+{{ macros.make_form(form, form_id) }}
+
+{% endblock %}
+
+{% block scripts %}
+{{ macros.js_send_request(form_id, url_for('add_player_to_team', id=team.id), "Jugador agregado.") }}
+{% endblock %}

@@ -9,7 +9,7 @@ from flask import (
 
 from . import app
 from .models import FbcmError, Player, Team, Championship
-from .forms import PlayerForm, TeamForm, ChampionshipForm
+from .forms import PlayerForm, TeamForm, ChampionshipForm, AddPlayerToTeamForm
 
 
 def get_first_error(form):
@@ -58,13 +58,36 @@ def teams(id):
     if id:
         team = Team.get(id=id)
         if team:
-            return render_template('team.html', team=team)
+            form = AddPlayerToTeamForm(csrf_enabled=False)
+            return render_template('team.html', team=team, form=form)
         else:
             abort(404)
     else:
         teams = Team.select()
         form = TeamForm(csrf_enabled=False)
         return render_template('teams.html', teams=teams, form=form)
+
+
+@app.route('/teams/<id>/addplayer', methods=['POST'])
+@db_session
+def add_player_to_team(id):
+    form = AddPlayerToTeamForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        team = Team[id]
+        player_id = form.player_id.data
+        #  if team.players.select(lambda player: player.id == player_id):
+        #      raise FbcmError(
+        #          "El jugador ya se encuentra registrado en el equipo."
+        #      )
+        player = Player.get(id=player_id)
+        player.set(
+            number=form.number.data,
+            position=form.position.data,
+            team=team
+        )
+        return redirect(url_for('teams', id=id))
+    else:
+        raise FbcmError(get_first_error(form))
 
 
 @app.route('/teams/new', methods=['POST'])

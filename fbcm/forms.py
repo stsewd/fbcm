@@ -70,6 +70,28 @@ class TeamForm(FlaskForm):
         return Team.exists(name=name)
 
 
+class AddPlayerToTeamForm(FlaskForm):
+    player_id = StringField("ID", validators=[
+        DataRequired(message="ID faltante.")
+    ])
+
+    number = StringField('Número', validators=[
+        DataRequired(message="Número del jugador faltante.")
+    ])
+
+    position = StringField('Posición', validators=[
+        DataRequired(message="Posición del jugador faltante.")
+    ])
+
+    def validate_player_id(form, field):
+        error = ""
+        id = field.data
+        if not PlayerForm._player_exists(id):
+            error = "El jugador no existe."
+        if error:
+            raise ValidationError(error)
+
+
 class ChampionshipForm(FlaskForm):
     name = StringField('Nombre', validators=[
         DataRequired(message="Nombre faltante."),
