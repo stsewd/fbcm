@@ -9,3 +9,6 @@ run:
 
 test:
 	$(PYTHON) -m $(TEST_RUNNER) $(TEST_RUNNER_ARGS)
+
+populate:
+	$(PYTHON) run.py populate
