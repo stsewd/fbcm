@@ -21,7 +21,9 @@
   <tr>
     <th scope="row">Equipo</th>
     <td>
+      <a href="{{ url_for('teams', id=player.team.id) }}">
       {{ player.team.name }}
+      </a>
     </td>
   </tr>
   <tr>
