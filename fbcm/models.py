@@ -31,8 +31,9 @@ class Person(db.Entity):
 class Player(Person):
     team = orm.Optional('Team')
     position = orm.Optional(str)
-    number = orm.Optional(int, unique=True)
+    number = orm.Optional(int)
     goals = orm.Set('Goal')
+    orm.composite_key(team, number)
 
 
 class Team(db.Entity):
