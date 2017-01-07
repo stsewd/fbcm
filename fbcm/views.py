@@ -19,6 +19,19 @@ def get_first_error(form):
         return ""
 
 
+def validate_player(team, player, number):
+    error = ""
+    if player in team.players:
+        error = "El jugador ya se encuentra registrado en el equipo."
+    elif player.team:
+        error = "El jugador ya pertenece a otro equipo."
+    elif team.players.select(lambda player: player.number == number):
+        error = "El número {} ya está ocupado.".format(number)
+
+    if error:
+        raise FbcmError(error)
+
+
 @app.route('/')
 def index():
     return redirect(url_for('players'))
@@ -73,16 +86,16 @@ def teams(id):
 def add_player_to_team(id):
     form = AddPlayerToTeamForm(csrf_enabled=False)
     if form.validate_on_submit():
-        team = Team[id]
         player_id = form.player_id.data
-        #  if team.players.select(lambda player: player.id == player_id):
-        #      raise FbcmError(
-        #          "El jugador ya se encuentra registrado en el equipo."
-        #      )
-        player = Player.get(id=player_id)
+        number = form.number.data
+        position = form.position.data
+
+        team = Team[id]
+        player = Player[player_id]
+        validate_player(team, player, number)
         player.set(
-            number=form.number.data,
-            position=form.position.data,
+            number=number,
+            position=position,
             team=team
         )
         return redirect(url_for('teams', id=id))
