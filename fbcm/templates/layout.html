@@ -1,10 +1,11 @@
-{% if "X-PJAX" not in request.headers %}
+{% set isnpjax = "X-PJAX" not in request.headers %}
+{% if isnpjax %}
 <!DOCTYPE html>
 <html lang="es">
   <head>
 {% endif %}
     {% block head %}
-{% if "X-PJAX" not in request.headers %}
+{% if isnpjax %}
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,14 +13,14 @@
 
     <title>{% block title %}Football Championship Manager{% endblock %} - FBCM</title>
 
-{% if "X-PJAX" not in request.headers %}
+{% if isnpjax %}
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}" type="text/css"/>
 {% endif %}
     {% endblock %}
-{% if "X-PJAX" not in request.headers %}
+{% if isnpjax %}
   </head>
 
   <body>
@@ -56,7 +57,7 @@
           {% block body %}
           <h1>Hello, world!</h1>
           {% endblock %}
-{% if "X-PJAX" not in request.headers %}
+{% if isnpjax %}
         </div>
       </div>
     </div>
@@ -68,7 +69,7 @@
 {% endif %}
     {% block scripts %}
     {% endblock %}
-{% if "X-PJAX" not in request.headers %}
+{% if isnpjax %}
   </body>
 </html>
 {% endif %}
