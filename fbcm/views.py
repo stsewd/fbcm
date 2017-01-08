@@ -8,7 +8,7 @@ from flask import (
 )
 
 from . import app
-from .models import FbcmError, Player, Team, Championship
+from .models import FbcmError, Player, Team, Championship, Stage
 from .forms import (
     PlayerForm,
     TeamForm,
@@ -36,6 +36,48 @@ def validate_player(team, player, number):
 
     if error:
         raise FbcmError(error)
+
+
+def add_default_stages(championship):
+    Stage(
+        id=0,
+        championship=championship,
+        name="Primera etapa",
+        num_groups=4,
+        algorithm='round-robin',
+        num_select=2,
+        draw=True
+    )
+
+    Stage(
+        id=1,
+        championship=championship,
+        name="Cuartos de final",
+        num_groups=4,
+        algorithm="first-last",
+        num_select=1,
+        draw=False
+    )
+
+    Stage(
+        id=2,
+        championship=championship,
+        name="Semifinal",
+        num_groups=2,
+        algorithm="random",
+        num_select=1,
+        draw=False
+    )
+
+    Stage(
+        id=3,
+        championship=championship,
+        name="Final",
+        num_groups=1,
+        algorithm="random",
+        num_select=1,
+        draw=False
+    )
 
 
 @app.route('/')
@@ -171,12 +213,13 @@ def add_team_to_championship(id):
 def add_championship():
     form = ChampionshipForm(csrf_enabled=False)
     if form.validate_on_submit():
-        Championship(
+        championship = Championship(
             **form.data,
             points_winner=2,
             points_draw=1,
             points_loser=0
         )
+        add_default_stages(championship)
         return redirect(url_for('championships'))
     else:
         raise FbcmError(get_first_error(form))

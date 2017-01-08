@@ -69,7 +69,7 @@ class Goal(db.Entity):
 
 
 class Stage(db.Entity):
-    id = orm.Required(int)
+    id = orm.Required(int)  # Must be secuential
     championship = orm.Required(Championship)
     name = orm.Required(str, unique=True)
     num_groups = orm.Required(int)
@@ -77,8 +77,6 @@ class Stage(db.Entity):
     num_select = orm.Required(int)  # number of winners for next stage
     draw = orm.Required(bool, default=True)  # Permitir empates?
     groups = orm.Set('Group')  # Number defined by each stage
-    next_stage = orm.Optional('Stage', reverse='next_stage')
-    prev_stage = orm.Optional('Stage', reverse='prev_stage')
     orm.PrimaryKey(id, championship)
 
 
