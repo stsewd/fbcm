@@ -15,6 +15,12 @@ def server():
 
 
 @cli.command()
+def clean_database():
+    from fbcm.models import db
+    db.drop_all_tables(with_all_data=True)
+
+
+@cli.command()
 def populate():
     populate_persons()
     populate_teams()

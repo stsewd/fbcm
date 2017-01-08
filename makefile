@@ -12,3 +12,6 @@ test:
 
 populate:
 	$(PYTHON) run.py populate
+
+clean-db:
+	$(PYTHON) run.py clean_database
