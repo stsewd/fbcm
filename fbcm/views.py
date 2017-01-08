@@ -9,7 +9,13 @@ from flask import (
 
 from . import app
 from .models import FbcmError, Player, Team, Championship
-from .forms import PlayerForm, TeamForm, ChampionshipForm, AddPlayerToTeamForm
+from .forms import (
+    PlayerForm,
+    TeamForm,
+    ChampionshipForm,
+    AddPlayerToTeamForm,
+    AddTeamToChampionshipForm
+)
 
 
 def get_first_error(form):
@@ -119,7 +125,16 @@ def add_team():
 @db_session
 def championships(id):
     if id:
-        return "Championship: {}".format(id)
+        championship = Championship.get(id=id)
+        if championship:
+            form = AddTeamToChampionshipForm(csrf_enabled=False)
+            return render_template(
+                'championship.html',
+                championship=championship,
+                form=form
+            )
+        else:
+            abort(404)
     else:
         championships = Championship.select()
         form = ChampionshipForm(csrf_enabled=False)
@@ -128,6 +143,27 @@ def championships(id):
             championships=championships,
             form=form
         )
+
+
+@app.route('/championships/<id>/addteam', methods=['POST'])
+@db_session
+def add_team_to_championship(id):
+    form = AddTeamToChampionshipForm(csrf_enabled=False)
+    if form.validate_on_submit():
+        team_name = form.team_name.data
+
+        championship = Championship[id]
+        team = Team.get(name=team_name)
+
+        if championship.teams.select(lambda teamc: teamc.team == team):
+            raise FbcmError(
+                "El equipo ya se encuentra registrado en el campeonato."
+            )
+
+        championship.teams.create(team=team)
+        return redirect(url_for('championships', id=id))
+    else:
+        raise FbcmError(get_first_error(form))
 
 
 @app.route('/championships/new', methods=['POST'])

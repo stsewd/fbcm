@@ -113,3 +113,17 @@ class ChampionshipForm(FlaskForm):
     @db_session
     def _championship_exists(name):
         return Championship.exists(name=name)
+
+
+class AddTeamToChampionshipForm(FlaskForm):
+    team_name = StringField("Equipo", validators=[
+        DataRequired(message="Equipo faltante.")
+    ])
+
+    def validate_team_name(form, field):
+        error = ""
+        name = field.data
+        if not TeamForm._team_exists(name):
+            error = "El equipo no existe."
+        if error:
+            raise ValidationError(error)
