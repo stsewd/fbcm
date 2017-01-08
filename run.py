@@ -22,8 +22,11 @@ def clean_database():
 
 @cli.command()
 def populate():
-    populate_persons()
-    populate_teams()
+    populate_persons(20*11)
+    populate_teams(20)
+    populate_championships()
+    register_players_on_teams()
+    register_teams_to_championship()
 
 
 def populate_persons(n=50):
@@ -38,7 +41,7 @@ def populate_persons(n=50):
                 Player(
                     id=fake.numerify('#' * 10),
                     name=fake.first_name(),
-                    lastname=fake.last_name()
+                    lastname=fake.last_name(),
                 )
             except Exception:
                 continue
@@ -56,6 +59,58 @@ def populate_teams(n=32):
                 Team(name=fake.country())
             except Exception:
                 continue
+
+
+def populate_championships():
+    from pony.orm import db_session
+    from fbcm.models import Championship
+    from fbcm.views import add_default_stages
+
+    with db_session:
+        c = Championship(
+            name="El Campeonato",
+            description="""
+                Campeonato de fútbol que será jugado en algún momento del 2017.
+            """,
+            points_winner=2,
+            points_draw=1,
+            points_loser=0
+        )
+        add_default_stages(c)
+
+
+def register_players_on_teams(num_players=11, num_teams=16):
+    from pony.orm import db_session
+    from fbcm.models import Team, Player
+    import random
+
+    with db_session:
+        teams = Team.select()[:num_teams]
+
+        positions = ('arquero', 'defensa', 'delantero', 'mediocampista')
+        for page, team in enumerate(teams, 1):
+            players = Player.select().page(page, pagesize=num_players)
+            for number, player in enumerate(players):
+                player.set(
+                    number=number,
+                    position=random.choice(positions)
+                )
+            team.set(
+                players=players
+            )
+
+
+def register_teams_to_championship(n=16):
+    from pony.orm import db_session
+    from fbcm.models import Championship, Team
+
+    team_name = "El Campeonato"
+    with db_session:
+        championship = Championship.get(name=team_name)
+        for team in Team.select()[:n]:
+            team.championships.create(
+                championship=championship
+            )
 
 
 if __name__ == "__main__":
