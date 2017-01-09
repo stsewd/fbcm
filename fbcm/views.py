@@ -86,7 +86,7 @@ def index():
 
 
 @app.route('/players/', defaults={'id': None})
-@app.route('/players/<id>')
+@app.route('/players/<id>/')
 @db_session
 def players(id):
     if id:
@@ -101,7 +101,7 @@ def players(id):
         return render_template('players.html', players=players, form=form)
 
 
-@app.route('/players/new', methods=['POST'])
+@app.route('/players/new/', methods=['POST'])
 @db_session
 def add_player():
     form = PlayerForm(csrf_enabled=False)
@@ -113,7 +113,7 @@ def add_player():
 
 
 @app.route('/teams/', defaults={'id': None})
-@app.route('/teams/<id>')
+@app.route('/teams/<id>/')
 @db_session
 def teams(id):
     if id:
@@ -129,7 +129,7 @@ def teams(id):
         return render_template('teams.html', teams=teams, form=form)
 
 
-@app.route('/teams/<id>/addplayer', methods=['POST'])
+@app.route('/teams/<id>/addplayer/', methods=['POST'])
 @db_session
 def add_player_to_team(id):
     form = AddPlayerToTeamForm(csrf_enabled=False)
@@ -151,7 +151,7 @@ def add_player_to_team(id):
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/teams/new', methods=['POST'])
+@app.route('/teams/new/', methods=['POST'])
 @db_session
 def add_team():
     form = TeamForm(csrf_enabled=False)
@@ -163,7 +163,7 @@ def add_team():
 
 
 @app.route('/championships/', defaults={'id': None})
-@app.route('/championships/<id>')
+@app.route('/championships/<id>/')
 @db_session
 def championships(id):
     if id:
@@ -187,7 +187,7 @@ def championships(id):
         )
 
 
-@app.route('/championships/<id>/addteam', methods=['POST'])
+@app.route('/championships/<id>/addteam/', methods=['POST'])
 @db_session
 def add_team_to_championship(id):
     form = AddTeamToChampionshipForm(csrf_enabled=False)
@@ -208,7 +208,7 @@ def add_team_to_championship(id):
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/championships/new', methods=['POST'])
+@app.route('/championships/new/', methods=['POST'])
 @db_session
 def add_championship():
     form = ChampionshipForm(csrf_enabled=False)
