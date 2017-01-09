@@ -71,7 +71,7 @@ class Goal(db.Entity):
 class Stage(db.Entity):
     id = orm.Required(int)  # Must be secuential
     championship = orm.Required(Championship)
-    name = orm.Required(str, unique=True)
+    name = orm.Required(str)
     num_groups = orm.Required(int)
     algorithm = orm.Required(str)  # Algorithm for make the rounds
     num_select = orm.Required(int)  # number of winners for next stage
