@@ -56,7 +56,3 @@ function sendRequest(form, method, url, success) {
 $(document).ready(function () {
   $(document).pjax('a', '#main-content');
 });
-
-$(document).on('submit', 'form', function(e) {
-  $.pjax.submit(e, '#pjax-container');
-});
