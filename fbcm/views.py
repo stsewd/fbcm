@@ -228,11 +228,20 @@ def add_championship():
 @app.route('/championships/<championship_id>/stage/<stage_id>/<int:group>/')
 @db_session
 def stages(championship_id, stage_id, group):
-    # TODO: validate for 404
     championship = Championship.get(id=championship_id)
+    if not championship:
+        abort(404)
+
     stage = championship.stages.select(
         lambda stage: stage.id == stage_id
-    )[:1][0]
+    )
+    if not stage:
+        abort(404)
+    stage = stage[:1][0]
+
+    if not (0 < group <= stage.num_groups):
+        abort(404)
+
     return render_template(
         "stage.html",
         stage=stage,
