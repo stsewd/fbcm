@@ -225,6 +225,22 @@ def add_championship():
         raise FbcmError(get_first_error(form))
 
 
+@app.route('/championships/<championship_id>/stage/<stage_id>/<int:group>/')
+@db_session
+def stages(championship_id, stage_id, group):
+    # TODO: validate for 404
+    championship = Championship.get(id=championship_id)
+    stage = championship.stages.select(
+        lambda stage: stage.id == stage_id
+    )[:1][0]
+    return render_template(
+        "stage.html",
+        stage=stage,
+        group=group,
+        stages=championship.stages.select().order_by(lambda stage: stage.id)
+    )
+
+
 @app.errorhandler(FbcmError)
 def fbcm_error_handler(error):
     response = jsonify(error.to_dict())
