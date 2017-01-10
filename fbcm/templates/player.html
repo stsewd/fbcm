@@ -7,7 +7,11 @@
 <table class="table">
   <tr>
     <th scope="row">ID</th>
-    <td>{{ player.id }}</td>
+    <td>
+      <a href="{{ url_for('players', id=player.id) }}">
+        {{ player.id }}
+      </a>
+    </td>
   </tr>
   <tr>
     <th scope="row">Nombre</th>

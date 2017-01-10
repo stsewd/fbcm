@@ -6,12 +6,22 @@
 {% set form_id = "form-add-team-to-championship"%}
 
 {% block body %}
-<h1>{{ championship.name }}</h1>
+<h1>
+  <a href="{{ url_for('championships', id=championship.id) }}">
+    {{ championship.name }}</h1>
+  </a>
 <blockquote>
   <p class="text-muted">
     {{ championship.description }}
   </p>
 </blockquote>
+
+<div class="btn-group">
+  <a class="btn btn-primary" href="{{ url_for('stages', championship_id=championship.id, stage_id=0, group=1) }}">
+    Empezar/Reanudar
+  </a>
+<buttom class="btn btn-secondary" disabled>Top Jugadores</buttom>
+</div>
 
 <h2>Equipos</h2>
 <table class="table table-striped table-hover">

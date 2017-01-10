@@ -6,7 +6,12 @@
 {% set form_id = "form-add-player-to-team" %}
 
 {% block body %}
-<h1>{{ team.name }}</h1>
+<h1>
+  <a href="{{ url_for('teams', id=team.id) }}">
+    {{ team.name }}
+  </a>
+</h1>
+
 <h2>Jugadores</h2>
 <table class="table table-striped table-hover">
   <thead>
