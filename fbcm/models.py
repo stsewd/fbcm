@@ -56,10 +56,12 @@ class Championship(db.Entity):
 
 class Match(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
+    group = orm.Required(int)
     round = orm.Required(int)  # Depends on num_rounds of Stage
-    group = orm.Required('Group')
     team_matches = orm.Set('TeamMatch')  # Just two
     is_finish = orm.Required(bool, default=False)
+    stage = orm.Required('Stage')
+    orm.composite_key(id, round, group)
 
 
 class Goal(db.Entity):
@@ -76,15 +78,8 @@ class Stage(db.Entity):
     algorithm = orm.Required(str)  # Algorithm for make the rounds
     num_select = orm.Required(int)  # number of winners for next stage
     draw = orm.Required(bool, default=True)  # Permitir empates?
-    groups = orm.Set('Group')  # Number defined by each stage
-    orm.PrimaryKey(id, championship)
-
-
-class Group(db.Entity):
-    id = orm.Required(int)
-    stage = orm.Required(Stage)
     matches = orm.Set(Match)
-    orm.PrimaryKey(id, stage)
+    orm.PrimaryKey(id, championship)
 
 
 class TeamMatch(db.Entity):
