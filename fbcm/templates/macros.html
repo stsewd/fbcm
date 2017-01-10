@@ -10,10 +10,12 @@
 {%- endmacro %}
 
 
-{% macro js_send_request(form_id, url, message) -%}
+{% macro js_send_request(form_id, url, message, type="POST") -%}
 <script>
-  sendRequest('#{{ form_id }}', 'POST', '{{ url }}', function (data, status) {
+  sendRequest('#{{ form_id }}', '{{ type }}', '{{ url }}', function (data, status) {
+    {% if message %}
     showAlert('alert-success', '{{ message }}');
+    {% endif %}
     $.pjax.reload('#main-content');
   });
 </script>

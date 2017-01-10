@@ -4,7 +4,8 @@ from flask import (
     jsonify,
     redirect,
     render_template,
-    url_for
+    url_for,
+    request
 )
 
 from . import app
@@ -225,9 +226,12 @@ def add_championship():
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/championships/<championship_id>/stage/<stage_id>/<int:group>/')
+@app.route('/championships/<championship_id>/stages/', methods=['GET'])
 @db_session
-def stages(championship_id, stage_id, group):
+def stages(championship_id):
+    stage_id = int(request.args.get('stage', '0'))
+    group = int(request.args.get('group', '1'))
+
     championship = Championship.get(id=championship_id)
     if not championship:
         abort(404)

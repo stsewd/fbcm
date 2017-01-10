@@ -4,6 +4,7 @@
 {% block title %}{{ stage.name }}{% endblock %}
 
 {% set championship = stage.championship %}
+{% set form_id = "form-choose-stage" %}
 
 {% block body %}
 <h1>
@@ -12,7 +13,7 @@
   </a>
 </h1>
 <div>
-  <form>
+  <form id="{{ form_id }}">
     <div class="form-group">
       <label for="stage-combo">Etapa</label>
       <select id="stage-combo" class="form-control" name="stage">
@@ -67,4 +68,19 @@
 
 </div>
 
+{% endblock %}
+
+{% block scripts %}
+<script>
+	$(function() {
+		$('#group-combo').change(function() {
+			this.form.submit();
+		});
+
+		$('#stage-combo').change(function() {
+			stage = $(this).val()
+			window.location = "{{ url_for('stages', championship_id=championship.id) }}" + "?stage=" + stage;
+		});
+	});
+</script>
 {% endblock %}
