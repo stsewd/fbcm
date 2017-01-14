@@ -98,17 +98,17 @@ def players(id):
             abort(404)
     else:
         players = Player.select()
-        form = PlayerForm(csrf_enabled=False)
+        form = PlayerForm()
         return render_template('players.html', players=players, form=form)
 
 
 @app.route('/players/new/', methods=['POST'])
 @db_session
 def add_player():
-    form = PlayerForm(csrf_enabled=False)
+    form = PlayerForm()
     if form.validate_on_submit():
         Player(**form.data)
-        return redirect(url_for('players'))  # TODO: redirect to player?
+        return redirect(url_for('players'))
     else:
         raise FbcmError(get_first_error(form))
 
@@ -120,20 +120,20 @@ def teams(id):
     if id:
         team = Team.get(id=id)
         if team:
-            form = AddPlayerToTeamForm(csrf_enabled=False)
+            form = AddPlayerToTeamForm()
             return render_template('team.html', team=team, form=form)
         else:
             abort(404)
     else:
         teams = Team.select()
-        form = TeamForm(csrf_enabled=False)
+        form = TeamForm()
         return render_template('teams.html', teams=teams, form=form)
 
 
 @app.route('/teams/<id>/addplayer/', methods=['POST'])
 @db_session
 def add_player_to_team(id):
-    form = AddPlayerToTeamForm(csrf_enabled=False)
+    form = AddPlayerToTeamForm()
     if form.validate_on_submit():
         player_id = form.player_id.data
         number = form.number.data
@@ -155,7 +155,7 @@ def add_player_to_team(id):
 @app.route('/teams/new/', methods=['POST'])
 @db_session
 def add_team():
-    form = TeamForm(csrf_enabled=False)
+    form = TeamForm()
     if form.validate_on_submit():
         Team(**form.data)
         return redirect(url_for('teams'))
@@ -170,7 +170,7 @@ def championships(id):
     if id:
         championship = Championship.get(id=id)
         if championship:
-            form = AddTeamToChampionshipForm(csrf_enabled=False)
+            form = AddTeamToChampionshipForm()
             return render_template(
                 'championship.html',
                 championship=championship,
@@ -180,7 +180,7 @@ def championships(id):
             abort(404)
     else:
         championships = Championship.select()
-        form = ChampionshipForm(csrf_enabled=False)
+        form = ChampionshipForm()
         return render_template(
             'championships.html',
             championships=championships,
@@ -191,7 +191,7 @@ def championships(id):
 @app.route('/championships/<id>/addteam/', methods=['POST'])
 @db_session
 def add_team_to_championship(id):
-    form = AddTeamToChampionshipForm(csrf_enabled=False)
+    form = AddTeamToChampionshipForm()
     if form.validate_on_submit():
         team_name = form.team_name.data
 
@@ -212,7 +212,7 @@ def add_team_to_championship(id):
 @app.route('/championships/new/', methods=['POST'])
 @db_session
 def add_championship():
-    form = ChampionshipForm(csrf_enabled=False)
+    form = ChampionshipForm()
     if form.validate_on_submit():
         championship = Championship(
             **form.data,
@@ -250,7 +250,9 @@ def stages(championship_id):
         "stage.html",
         stage=stage,
         group=group,
-        stages=championship.stages.select().order_by(lambda stage: stage.id)
+        stages=championship.stages.select().order_by(
+            lambda stage: stage.id
+        )
     )
 
 

@@ -17,6 +17,9 @@ def only_alpha(form, field):
 
 
 class PlayerForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     id = StringField('ID', validators=[
         DataRequired(message="ID faltante."),
         Length(min=10, max=10, message="El id debe tener 10 dígitos.")
@@ -51,6 +54,9 @@ class PlayerForm(FlaskForm):
 
 
 class TeamForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     name = StringField('Nombre', validators=[
         DataRequired(message="Nombre faltante."),
         Length(max=90, message="Nombre demasiado largo.")
@@ -71,6 +77,9 @@ class TeamForm(FlaskForm):
 
 
 class AddPlayerToTeamForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     player_id = StringField("ID", validators=[
         DataRequired(message="ID faltante.")
     ])
@@ -93,6 +102,9 @@ class AddPlayerToTeamForm(FlaskForm):
 
 
 class ChampionshipForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     name = StringField('Nombre', validators=[
         DataRequired(message="Nombre faltante."),
         Length(max=90, message="Nombre demasiado largo.")
@@ -116,6 +128,9 @@ class ChampionshipForm(FlaskForm):
 
 
 class AddTeamToChampionshipForm(FlaskForm):
+    class Meta:
+        csrf = False
+
     team_name = StringField("Equipo", validators=[
         DataRequired(message="Equipo faltante.")
     ])
