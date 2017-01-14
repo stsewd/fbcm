@@ -2,7 +2,8 @@
 <form id="{{ id }}">
   {% for field in form if field.name not in excludes %}
   <div class="form-group">
-    {{ field.label }} {{ field(class="form-control", required="required") }}
+    {% set required = True if field.flags.required else False %}
+    {{ field.label }} {{ field(class="form-control", required=required) }}
   </div>
   {% endfor %}
   <button type="submit" class="btn btn-primary">{{ submit }}</button>
@@ -10,13 +11,50 @@
 {%- endmacro %}
 
 
-{% macro js_send_request(form_id, url, message, type="POST") -%}
+{% macro make_modal_from_form(title, id, form, form_id, submit="Agregar", excludes=['csrf_token']) -%}
+<div id="{{ id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{ title }}</h4>
+      </div>
+      <form id="{{ form_id }}">
+        <div class="modal-body">
+          {% for field in form if field.name not in excludes %}
+          <div class="form-group">
+            {% set required = True if field.flags.required else False %}
+            {{ field.label }} {{ field(class="form-control", required=required) }}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">{{ submit }}</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{%- endmacro %}
+
+
+{% macro js_send_request(form_id, url, message, type="POST", modal_id=None) -%}
 <script>
   sendRequest('#{{ form_id }}', '{{ type }}', '{{ url }}', function (data, status) {
     {% if message %}
     showAlert('alert-success', '{{ message }}');
     {% endif %}
+
+    {% if modal_id %}
+    modal = $('#{{ modal_id }}');
+    modal.on('hidden.bs.modal', function (e) {
+      $.pjax.reload('#main-content');
+    });
+    modal.modal('hide');
+    {% else %}
     $.pjax.reload('#main-content');
+    {% endif %}
   });
 </script>
 {%- endmacro %}

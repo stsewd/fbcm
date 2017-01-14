@@ -6,10 +6,16 @@
 
 
 {% set form_id = 'form-add-player' %}
+{% set modal_id = 'modal-add-player' %}
 
 
 {% block body %}
 <h1>Jugadores</h1>
+<div class="btn-group">
+  <div class="btn btn-primary" data-toggle="modal" data-target="#{{ modal_id }}">
+    Agregar
+  </div>
+</div>
 <table class="table table-striped table-hover">
   <thead>
     <tr>
@@ -41,12 +47,14 @@
   </tbody>
 </table>
 
-<h2>Nuevo Jugador</h2>
-{{ macros.make_form(form, form_id) }}
+{% endblock %}
 
+
+{% block modals %}
+{{ macros.make_modal_from_form("Nuevo Jugador", modal_id, form, form_id) }}
 {% endblock %}
 
 
 {% block scripts %}
-{{ macros.js_send_request(form_id, url_for('add_player'), "Jugador agregado.") }}
+{{ macros.js_send_request(form_id, url_for('add_player'), "Jugador agregado.", modal_id=modal_id) }}
 {% endblock %}
