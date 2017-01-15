@@ -1,3 +1,5 @@
+import math
+
 from pony import orm
 
 from . import app
@@ -79,6 +81,65 @@ class Stage(db.Entity):
     draw = orm.Required(bool, default=True)  # Permitir empates?
     matches = orm.Set(Match)
     orm.PrimaryKey(id, championship)
+
+    def create_matches(self):
+        for group, round, teams in self._generate_matches():
+            print(group, round, teams)
+            match = self.matches.create(
+                group=group,
+                round=round,
+                is_finish=False
+            )
+            print(match)
+            for team in teams:
+                match.team_matches.create(
+                    team=team
+                )
+
+    def _generate_matches(self):
+        for group in range(1, self.num_groups + 1):
+            teams = self.get_teams(group)[:]
+            n = len(teams)
+            generator = self._get_matches_generator()
+            for round, teams_index in generator(n):
+                yield group, round, (teams[i] for i in teams_index)
+
+    def _get_matches_generator(self):
+        matches_generators = {
+            'round-robin': Stage.round_robin,
+        }
+        return matches_generators.get(self.algorithm)
+
+    @staticmethod
+    def round_robin(n):
+        max_odd = n - 1 if n % 2 == 0 else n
+        team_a = 0
+        team_b = max_odd - 1
+        for round in range(1, n - (n % 2 == 0) + 1):
+            for match in range(n//2):
+                if match == 0:
+                    if n % 2 == 0:
+                        yield round, (team_a, n - 1)
+                else:
+                    yield round, (team_a, team_b)
+                    team_b = (team_b - 1) % max_odd
+                team_a = (team_a + 1) % max_odd
+
+    def get_teams(self, group):
+        if self.id == 0:
+            teams = self.championship.teams
+            return teams.order_by(
+                lambda team_match: team_match.team.name
+            ).page(group, pagesize=math.ceil(len(teams)/self.num_groups))
+        else:
+            return []
+
+    def get_matches(self, group):
+        return self.matches.select(
+            lambda match: match.group == group
+        ).order_by(
+            lambda match: match.group
+        )
 
 
 class TeamMatch(db.Entity):
