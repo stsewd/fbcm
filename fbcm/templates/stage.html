@@ -56,31 +56,145 @@
   </ul>
 
   <div class="tab-content">
-	  <div id="teams" class="tab-pane fade in active">
-			<h3>HOME</h3>
-			<p>Some content.</p>
-		</div>
-		<div id="matches" class="tab-pane fade">
-			<h3>Menu 1</h3>
-			<p>Some content in menu 1.</p>
-		</div>
-	</div>
+    <div id="teams" class="tab-pane fade in active">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Equipo</th>
+            <th>PJ</th>
+            <th>PG</th>
+            <th>PE</th>
+            <th>PP</th>
+            <th>GF</th>
+            <th>GC</th>
+            <th>Puntos</th>
+            <th>GD</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for team_championship in stage.get_teams(group) %}
+          {% set team = team_championship.team %}
+          <tr>
+            <td scope="row">
+              {{ loop.index }}
+            </td>
+            <td>
+              <a href="{{ url_for('teams', id=team.id) }}">
+                {{ team.name }}
+              </a>
+            </td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h3>Leyenda</h3>
+      <table class="table table-condensed text-muted">
+        <tr>
+          <th>PJ</th>
+          <td>Partidos jugados</td>
+        </tr>
+        <tr>
+          <th>PG</th>
+          <td>Partidos ganados</td>
+        </tr>
+        <tr>
+          <th>PE</th>
+          <td>Partidos empatados</td>
+        </tr>
+        <tr>
+          <th>PP</th>
+          <td>Partidos perdidos</td>
+        </tr>
+        <tr>
+          <th>GF</th>
+          <td>Goles a favor</td>
+        </tr>
+        <tr>
+          <th>GC</th>
+          <td>Goles en contra</td>
+        </tr>
+        <tr>
+          <th>GD</th>
+          <td>Gol diferencia (GF - GC)</td>
+        </tr>
+      </table>
+      
+    </div>
+
+    <div id="matches" class="tab-pane fade">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Equipo/Goles</th>
+            <th>Equipo/Goles</th>
+            <th>Ronda</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for match in stage.get_matches(group) %}
+          {% set bg = "bg-success" if match.is_finish else "" %}
+          <tr class="{{ bg }}">
+            <td scope="row">
+              {{ loop.index }}
+            </td>
+            {% for team_match in match.team_matches %}
+            {% set team = team_match.team.team %}
+            <td>
+              <a href="{{ url_for('teams', id=team.id) }}">
+                {{ team.name }}
+              </a>
+              -
+              0
+            </td>
+            {% endfor %}
+            <td>
+              {{ match.round }}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+
+      <h3>Leyenda</h3>
+      <table class="table table-condensed text-muted">
+        <tr>
+          <td class="bg-default">Partido por jugar</td>
+        </tr>
+        <tr>
+          <td class="bg-success">Partido jugado</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 
 </div>
 
 {% endblock %}
 
+
 {% block scripts %}
 <script>
-	$(function() {
-		$('#group-combo').change(function() {
-			this.form.submit();
-		});
+  $(function() {
+    $('#group-combo').change(function() {
+      this.form.submit();
+    });
 
-		$('#stage-combo').change(function() {
-			stage = $(this).val()
-			window.location = "{{ url_for('stages', championship_id=championship.id) }}" + "?stage=" + stage;
-		});
-	});
+    $('#stage-combo').change(function() {
+      stage = $(this).val()
+      window.location = "{{ url_for('stages', championship_id=championship.id) }}" + "?stage=" + stage;
+    });
+  });
 </script>
 {% endblock %}

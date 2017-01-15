@@ -252,8 +252,21 @@ def stages(championship_id):
         group=group,
         stages=championship.stages.select().order_by(
             lambda stage: stage.id
-        )
+        ),
     )
+
+
+@app.route(
+    '/championships/<championship_id>/stages/<stage_id>/start',
+    methods=['GET']
+)
+@db_session
+def start_stage(championship_id, stage_id):
+    stage = Stage.get(id=stage_id)
+    if not stage or not stage.matches.is_empty():
+        abort(404)
+    stage.create_matches()
+    return redirect(url_for('stages', championship_id=championship_id))
 
 
 @app.errorhandler(FbcmError)
