@@ -56,12 +56,11 @@ class Championship(db.Entity):
 
 class Match(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
+    stage = orm.Required('Stage')
     group = orm.Required(int)
-    round = orm.Required(int)  # Depends on num_rounds of Stage
+    round = orm.Required(int)
     team_matches = orm.Set('TeamMatch')  # Just two
     is_finish = orm.Required(bool, default=False)
-    stage = orm.Required('Stage')
-    orm.composite_key(id, round, group)
 
 
 class Goal(db.Entity):
@@ -84,8 +83,9 @@ class Stage(db.Entity):
 
 class TeamMatch(db.Entity):
     team = orm.Required('TeamChampionship')
-    match = orm.PrimaryKey(Match)
+    match = orm.Required(Match)
     goals = orm.Set(Goal)
+    orm.PrimaryKey(team, match)
 
 
 class TeamChampionship(db.Entity):
