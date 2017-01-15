@@ -1,6 +1,6 @@
 from pony.orm import db_session
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField
+from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
 
 from .models import Player, Team, Championship
@@ -88,9 +88,18 @@ class AddPlayerToTeamForm(FlaskForm):
         DataRequired(message="Número del jugador faltante.")
     ])
 
-    position = StringField('Posición', validators=[
-        DataRequired(message="Posición del jugador faltante.")
-    ])
+    position = SelectField(
+        'Posición',
+        validators=[
+            DataRequired(message="Posición del jugador faltante.")
+        ],
+        choices=[
+            ('arquero', 'Arquero'),
+            ('delantero', 'Delantero'),
+            ('defensa', 'Defensa'),
+            ('mediocampista', 'Mediocampista'),
+        ]
+    )
 
     def validate_player_id(form, field):
         error = ""
@@ -109,9 +118,15 @@ class ChampionshipForm(FlaskForm):
         DataRequired(message="Nombre faltante."),
         Length(max=90, message="Nombre demasiado largo.")
     ])
-    description = TextAreaField('Descripción', validators=[
-        Length(max=500, message="Descripción demasiada larga.")
-    ])
+    description = TextAreaField(
+        'Descripción',
+        validators=[
+            Length(max=500, message="Descripción demasiada larga.")
+        ],
+        render_kw={
+            'placeholder': "Descripción opcional."
+        }
+    )
 
     def validate_name(form, field):
         error = ""
