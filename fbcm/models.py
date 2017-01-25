@@ -1,4 +1,5 @@
 import math
+import random
 
 from pony import orm
 
@@ -124,6 +125,8 @@ class Stage(db.Entity):
     def _get_matches_generator(self):
         matches_generators = {
             'round-robin': Stage.round_robin,
+            'first-last': Stage.first_last,
+            'random': Stage.random
         }
         return matches_generators.get(self.algorithm)
 
@@ -134,13 +137,31 @@ class Stage(db.Entity):
         team_b = max_odd - 1
         for round in range(1, n - (n % 2 == 0) + 1):
             for match in range(n//2):
-                if match == 0:
-                    if n % 2 == 0:
-                        yield round, (team_a, n - 1)
+                if match == 0 and n % 2 == 0:
+                    yield round, (team_a, n - 1)
                 else:
                     yield round, (team_a, team_b)
                     team_b = (team_b - 1) % max_odd
                 team_a = (team_a + 1) % max_odd
+
+    @staticmethod
+    def first_last(n):
+        # TODO: when n is odd?
+        return (
+            (1, (team_a, n - team_a - 1))
+            for team_a in range(n//2)
+        )
+
+    @staticmethod
+    def random(n):
+        teams = set(range(n))
+        # TODO: if n is odd?
+        for _ in range(n//2):
+            team_a = random.select(teams)
+            teams.remove(team_a)
+            team_b = random.select(teams)
+            teams.remove(team_b)
+            yield (1, (team_a, team_b))
 
     def get_teams(self, group):
         if self.id == 0:
@@ -149,6 +170,7 @@ class Stage(db.Entity):
                 lambda team_match: team_match.team.name
             ).page(group, pagesize=math.ceil(len(teams)/self.num_groups))
         else:
+            # TODO
             return []
 
     def get_matches(self, group):
