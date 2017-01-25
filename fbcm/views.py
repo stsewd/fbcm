@@ -86,23 +86,25 @@ def index():
     return redirect(url_for('players'))
 
 
-@app.route('/players/', defaults={'id': None})
-@app.route('/players/<id>/')
+@app.route('/players/')
 @db_session
-def players(id):
-    if id:
-        player = Player.get(id=id)
-        if player:
-            return render_template('player.html', player=player)
-        else:
-            abort(404)
+def players():
+    players = Player.select()
+    form = PlayerForm()
+    return render_template('players.html', players=players, form=form)
+
+
+@app.route('/player/<id>/')
+@db_session
+def player(id):
+    player = Player.get(id=id)
+    if player:
+        return render_template('player.html', player=player)
     else:
-        players = Player.select()
-        form = PlayerForm()
-        return render_template('players.html', players=players, form=form)
+        abort(404)
 
 
-@app.route('/players/new/', methods=['POST'])
+@app.route('/player/new/', methods=['POST'])
 @db_session
 def add_player():
     form = PlayerForm()
@@ -113,24 +115,26 @@ def add_player():
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/teams/', defaults={'id': None})
-@app.route('/teams/<id>/')
+@app.route('/teams/')
 @db_session
-def teams(id):
-    if id:
-        team = Team.get(id=id)
-        if team:
-            form = AddPlayerToTeamForm()
-            return render_template('team.html', team=team, form=form)
-        else:
-            abort(404)
+def teams():
+    teams = Team.select()
+    form = TeamForm()
+    return render_template('teams.html', teams=teams, form=form)
+
+
+@app.route('/team/<id>/')
+@db_session
+def team(id):
+    team = Team.get(id=id)
+    if team:
+        form = AddPlayerToTeamForm()
+        return render_template('team.html', team=team, form=form)
     else:
-        teams = Team.select()
-        form = TeamForm()
-        return render_template('teams.html', teams=teams, form=form)
+        abort(404)
 
 
-@app.route('/teams/<id>/addplayer/', methods=['POST'])
+@app.route('/team/<id>/addplayer/', methods=['POST'])
 @db_session
 def add_player_to_team(id):
     form = AddPlayerToTeamForm()
@@ -152,7 +156,7 @@ def add_player_to_team(id):
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/teams/new/', methods=['POST'])
+@app.route('/team/new/', methods=['POST'])
 @db_session
 def add_team():
     form = TeamForm()
@@ -163,32 +167,34 @@ def add_team():
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/championships/', defaults={'id': None})
-@app.route('/championships/<id>/')
+@app.route('/championships/')
 @db_session
-def championships(id):
-    if id:
-        championship = Championship.get(id=id)
-        if championship:
-            form = AddTeamToChampionshipForm()
-            return render_template(
-                'championship.html',
-                championship=championship,
-                form=form
-            )
-        else:
-            abort(404)
-    else:
-        championships = Championship.select()
-        form = ChampionshipForm()
+def championships():
+    championships = Championship.select()
+    form = ChampionshipForm()
+    return render_template(
+        'championships.html',
+        championships=championships,
+        form=form
+    )
+
+
+@app.route('/championship/<id>/')
+@db_session
+def championship(id):
+    championship = Championship.get(id=id)
+    if championship:
+        form = AddTeamToChampionshipForm()
         return render_template(
-            'championships.html',
-            championships=championships,
+            'championship.html',
+            championship=championship,
             form=form
         )
+    else:
+        abort(404)
 
 
-@app.route('/championships/<id>/addteam/', methods=['POST'])
+@app.route('/championship/<id>/addteam/', methods=['POST'])
 @db_session
 def add_team_to_championship(id):
     form = AddTeamToChampionshipForm()
@@ -209,7 +215,7 @@ def add_team_to_championship(id):
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/championships/new/', methods=['POST'])
+@app.route('/championship/new/', methods=['POST'])
 @db_session
 def add_championship():
     form = ChampionshipForm()
@@ -226,7 +232,7 @@ def add_championship():
         raise FbcmError(get_first_error(form))
 
 
-@app.route('/championships/<championship_id>/stages/', methods=['GET'])
+@app.route('/championship/<championship_id>/stages/', methods=['GET'])
 @db_session
 def stages(championship_id):
     stage_id = int(request.args.get('stage', '0'))
@@ -257,8 +263,7 @@ def stages(championship_id):
 
 
 @app.route(
-    '/championships/<championship_id>/stages/<stage_id>/start',
-    methods=['GET']
+    '/championship/<championship_id>/stage/<stage_id>/start'
 )
 @db_session
 def start_stage(championship_id, stage_id):

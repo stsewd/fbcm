@@ -8,7 +8,7 @@
   <tr>
     <th scope="row">ID</th>
     <td>
-      <a href="{{ url_for('players', id=player.id) }}">
+      <a href="{{ url_for('player', id=player.id) }}">
         {{ player.id }}
       </a>
     </td>
@@ -25,7 +25,7 @@
   <tr>
     <th scope="row">Equipo</th>
     <td>
-      <a href="{{ url_for('teams', id=player.team.id) }}">
+      <a href="{{ url_for('team', id=player.team.id) }}">
       {{ player.team.name }}
       </a>
     </td>

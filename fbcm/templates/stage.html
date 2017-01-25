@@ -8,7 +8,7 @@
 
 {% block body %}
 <h1>
-  <a href="{{ url_for('championships', id=championship.id) }}">
+  <a href="{{ url_for('championship', id=championship.id) }}">
     {{ championship.name }}
   </a>
 </h1>
@@ -68,8 +68,8 @@
             <th>PP</th>
             <th>GF</th>
             <th>GC</th>
-            <th>Puntos</th>
             <th>GD</th>
+            <th>Puntos</th>
           </tr>
         </thead>
         <tbody>
@@ -80,7 +80,7 @@
               {{ loop.index }}
             </td>
             <td>
-              <a href="{{ url_for('teams', id=team.id) }}">
+              <a href="{{ url_for('team', id=team.id) }}">
                 {{ team.name }}
               </a>
             </td>
@@ -151,7 +151,7 @@
             {% for team_match in match.team_matches %}
             {% set team = team_match.team.team %}
             <td>
-              <a href="{{ url_for('teams', id=team.id) }}">
+              <a href="{{ url_for('team', id=team.id) }}">
                 {{ team.name }}
               </a>
               -
