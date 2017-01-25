@@ -55,6 +55,14 @@ class Championship(db.Entity):
     points_draw = orm.Required(int)
     points_loser = orm.Required(int)
 
+    @property
+    def state(self):
+        stage = self.stages.select(lambda stage: stage.id == 0)[:1][0]
+        if stage.matches.is_empty():
+            return "not_started"
+        else:
+            return "started"
+
 
 class Match(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
@@ -83,6 +91,8 @@ class Stage(db.Entity):
     orm.PrimaryKey(id, championship)
 
     def create_matches(self):
+        if not self.matches.is_empty():
+            raise FbcmError("Etapa ya comenzada")
         for group, round, teams in self._generate_matches():
             print(group, round, teams)
             match = self.matches.create(

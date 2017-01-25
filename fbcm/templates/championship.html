@@ -9,19 +9,34 @@
 
 {% block body %}
 <h1>
-  <a href="{{ url_for('championships', id=championship.id) }}">
-    {{ championship.name }}</h1>
+  <a href="{{ url_for('championship', id=championship.id) }}">
+    {{ championship.name }}
   </a>
+</h1>
+{% if championship.description %}
 <blockquote>
   <p class="text-muted">
     {{ championship.description }}
   </p>
 </blockquote>
+{% endif %}
 
 <div class="btn-group">
-  <a class="btn btn-primary" href="{{ url_for('stages', championship_id=championship.id, stage=0, group=1) }}">
-    Empezar/Reanudar
+  {% set state = championship.state %}
+
+  {% if state == "not_started"%}
+  <a class="btn btn-primary" href="{{ url_for('start_stage', championship_id=championship.id, stage_id=0) }}">
+    Empezar
   </a>
+  {% elif state == "started" %}
+  <a class="btn btn-primary" href="{{ url_for('stages', championship_id=championship.id, stage=0, group=1) }}">
+    Reanudar
+  </a>
+  {% elif state == "finish" %}
+  <a class="btn btn-primary" href="{{ url_for('stages', championship_id=championship.id, stage=0, group=1) }}">
+    Explorar
+  </a>
+  {% endif %}
   <buttom class="btn btn-secondary" disabled>Top Jugadores</buttom>
 </div>
 
@@ -46,7 +61,7 @@
         {{ loop.index }}
       </td>
       <td>
-        <a href="{{ url_for('teams', id=team.id) }}">
+        <a href="{{ url_for('team', id=team.id) }}">
           {{ team.name }}
         </a>
       </td>
