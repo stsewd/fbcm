@@ -22,6 +22,7 @@ def clean_database():
 
 @cli.command()
 def populate():
+    populate_positions()
     populate_persons(20*11)
     populate_teams(20)
     populate_championships()
@@ -81,19 +82,18 @@ def populate_championships():
 
 def register_players_on_teams(num_players=11, num_teams=16):
     from pony.orm import db_session
-    from fbcm.models import Team, Player
-    import random
+    from fbcm.models import Team, Player, Position
+    #  import random
 
     with db_session:
         teams = Team.select()[:num_teams]
 
-        positions = ('arquero', 'defensa', 'delantero', 'mediocampista')
         for page, team in enumerate(teams, 1):
             players = Player.select().page(page, pagesize=num_players)
             for number, player in enumerate(players):
                 player.set(
                     number=number,
-                    position=random.choice(positions)
+                    position=Position.select_random(1)[:1][0]
                 )
             team.set(
                 players=players
@@ -111,6 +111,16 @@ def register_teams_to_championship(n=16):
             team.championships.create(
                 championship=championship
             )
+
+
+def populate_positions():
+    from pony.orm import db_session
+    from fbcm.models import Position
+
+    with db_session:
+        for position in (
+                'arquero', 'defensa', 'delantero', 'mediocampista'):
+            Position(name=position)
 
 
 if __name__ == "__main__":

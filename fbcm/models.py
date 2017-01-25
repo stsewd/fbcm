@@ -32,10 +32,16 @@ class Person(db.Entity):
 
 class Player(Person):
     team = orm.Optional('Team')
-    position = orm.Optional(str)
+    position = orm.Optional('Position')
     number = orm.Optional(int)
     goals = orm.Set('Goal')
     orm.composite_key(team, number)
+
+
+class Position(db.Entity):
+    id = orm.PrimaryKey(int, auto=True)
+    name = orm.Required(str, 50, unique=True)
+    players = orm.Set(Player)
 
 
 class Team(db.Entity):
@@ -62,6 +68,7 @@ class Championship(db.Entity):
             return "not_started"
         else:
             return "started"
+        return "finished"  # TODO
 
 
 class Match(db.Entity):

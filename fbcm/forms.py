@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, ValidationError
 
-from .models import Player, Team, Championship
+from .models import Player, Team, Championship, Position
 
 
 def only_alpha(form, field):
@@ -14,6 +14,14 @@ def only_alpha(form, field):
                 name=field.label.text.lower()
             )
         )
+
+
+@db_session
+def get_positions():
+    return [
+        (str(p.id), p.name)
+        for p in Position.select()
+    ]
 
 
 class PlayerForm(FlaskForm):
@@ -93,12 +101,7 @@ class AddPlayerToTeamForm(FlaskForm):
         validators=[
             DataRequired(message="Posición del jugador faltante.")
         ],
-        choices=[
-            ('arquero', 'Arquero'),
-            ('delantero', 'Delantero'),
-            ('defensa', 'Defensa'),
-            ('mediocampista', 'Mediocampista'),
-        ]
+        choices=get_positions()
     )
 
     def validate_player_id(form, field):

@@ -1,15 +1,15 @@
 from pony.orm import db_session
 from flask import (
-    abort,
-    jsonify,
-    redirect,
-    render_template,
-    url_for,
+    abort, jsonify, redirect,
+    render_template, url_for,
     request
 )
 
 from . import app
-from .models import FbcmError, Player, Team, Championship, Stage
+from .models import (
+    FbcmError, Player, Team,
+    Championship, Stage, Position
+)
 from .forms import (
     PlayerForm,
     TeamForm,
@@ -148,7 +148,7 @@ def add_player_to_team(id):
         validate_player(team, player, number)
         player.set(
             number=number,
-            position=position,
+            position=Position.get(id=position),
             team=team
         )
         return redirect(url_for('teams', id=id))
@@ -258,7 +258,7 @@ def stages(championship_id):
         group=group,
         stages=championship.stages.select().order_by(
             lambda stage: stage.id
-        ),
+        )
     )
 
 
