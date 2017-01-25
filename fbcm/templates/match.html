@@ -1,0 +1,54 @@
+{% import "macros.html" as macros %}
+{% extends "layout.html" %}
+
+
+{% block title %}
+{# team_a.name #} VS {# team_b.name #}
+{% endblock %}
+
+
+{% set form_id = 'form-add-goal' %}
+{% set modal_id = 'modal-add-goal' %}
+
+{% set stage = match.stage %}
+{% set championship = stage.championship %}
+
+{% block body %}
+<div>
+  <h1>
+    <a href="{{ url_for('championship', id=championship.id) }}">
+      {{ championship.name }}
+    </a>
+  </h1>
+  <small>
+    <a href="{{ url_for('stages', championship_id=championship.id) }}?stage={{ stage.id }}&group={{ match.group }}">
+      {{ stage.name }} - Grupo {{ match.group }}
+    </a>
+  </small>
+</div>
+<h2>
+  {% for team_match in match.team_matches %}
+  {% set team = team_match.team.team %}
+  <a href="{{ url_for('team', id=team.id) }}">
+    {{ team.name }}
+  </a>
+  {% if loop.index == 1 %}
+  VS
+  {% endif %}
+  {% endfor %}
+</h2>
+<div class="btn-group">
+  <div class="btn btn-primary" data-toggle="modal" data-target="#{{ modal_id }}">
+    Gol
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+{{ macros.make_modal_from_form("Agregar Gol", modal_id, form, form_id) }}
+{% endblock %}
+
+
+{% block scripts %}
+{{ macros.js_send_request(form_id, url_for('goal', match_id=match.id), "Gol!", modal_id=modal_id) }}
+{% endblock %}

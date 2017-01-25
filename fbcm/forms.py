@@ -160,3 +160,32 @@ class AddTeamToChampionshipForm(FlaskForm):
             error = "El equipo no existe."
         if error:
             raise ValidationError(error)
+
+
+class GoalFormBase(FlaskForm):
+    class Meta:
+        csrf = False
+
+    team = SelectField(
+        'Equipo',
+        validators=[
+            DataRequired(message="Equipo faltante.")
+        ],
+        coerce=int
+    )
+
+    player = StringField('Jugador', validators=[
+        DataRequired(message="Jugador faltante.")
+    ])
+
+    def validate_player(form, field):
+        pass
+
+
+class GoalForm(GoalFormBase):
+    def __init__(self, match):
+        GoalFormBase.__init__(self)
+        self.team.choices = [
+            (tm.team.team.id, tm.team.team.name)
+            for tm in match.team_matches
+        ]

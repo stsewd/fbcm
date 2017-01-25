@@ -8,11 +8,13 @@ from flask import (
 from . import app
 from .models import (
     FbcmError, Player, Team,
-    Championship, Stage, Position
+    Championship, Stage, Position,
+    Match
 )
 from .forms import (
-    PlayerForm,
+    GoalForm,
     TeamForm,
+    PlayerForm,
     ChampionshipForm,
     AddPlayerToTeamForm,
     AddTeamToChampionshipForm
@@ -263,7 +265,7 @@ def stages(championship_id):
 
 
 @app.route(
-    '/championship/<championship_id>/stage/<stage_id>/start'
+    '/championship/<championship_id>/stage/<stage_id>/start/'
 )
 @db_session
 def start_stage(championship_id, stage_id):
@@ -272,6 +274,21 @@ def start_stage(championship_id, stage_id):
         abort(404)
     stage.create_matches()
     return redirect(url_for('stages', championship_id=championship_id))
+
+
+@app.route('/match/<match_id>/')
+@db_session
+def match(match_id):
+    match = Match.get(id=match_id)
+    if not match:
+        return abort(404)
+    form = GoalForm(match)
+    return render_template('match.html', form=form, match=match)
+
+
+@app.route('/match/<match_id>/goal/')
+def goal(match_id):
+    pass
 
 
 @app.errorhandler(FbcmError)

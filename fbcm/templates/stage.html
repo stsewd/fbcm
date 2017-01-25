@@ -139,6 +139,7 @@
             <th>Equipo/Goles</th>
             <th>Equipo/Goles</th>
             <th>Ronda</th>
+            <th>Acción</th>
           </tr>
         </thead>
         <tbody>
@@ -160,6 +161,11 @@
             {% endfor %}
             <td>
               {{ match.round }}
+            </td>
+            <td>
+              <a href="{{ url_for('match', match_id=match.id) }}">
+                Ver
+              </a>
             </td>
           </tr>
           {% endfor %}
