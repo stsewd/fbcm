@@ -35,7 +35,16 @@
           {{ championship.name }}
         </a>
       </td>
-      <td>estado</td>
+      <td>
+        {% set state = championship.state %}
+        {% if state == "started" %}
+        Empezado
+        {% elif state == "not_started" %}
+        No Empezado
+        {% elif state == "finished" %}
+        Finalizado
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </tbody>
