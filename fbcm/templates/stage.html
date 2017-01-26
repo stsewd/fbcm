@@ -163,7 +163,7 @@
               {{ match.round }}
             </td>
             <td>
-              <a href="{{ url_for('match', match_id=match.id) }}">
+              <a href="{{ url_for('match', championship=championship.id, stage=stage.id, group=match.group, round=match.round, match=match.id) }}">
                 Ver
               </a>
             </td>

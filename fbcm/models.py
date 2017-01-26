@@ -73,12 +73,13 @@ class Championship(db.Entity):
 
 
 class Match(db.Entity):
-    id = orm.PrimaryKey(int, auto=True)
+    id = orm.Required(int)
     stage = orm.Required('Stage')
     group = orm.Required(int)
     round = orm.Required(int)
     team_matches = orm.Set('TeamMatch')  # Just two
     is_finish = orm.Required(bool, default=False)
+    orm.PrimaryKey(id, stage, group, round)
 
 
 class Goal(db.Entity):
@@ -101,14 +102,14 @@ class Stage(db.Entity):
     def create_matches(self):
         if not self.matches.is_empty():
             raise FbcmError("Etapa ya comenzada")
-        for group, round, teams in self._generate_matches():
+        for group, round, match, teams in self._generate_matches():
             print(group, round, teams)
             match = self.matches.create(
+                id=match,
                 group=group,
                 round=round,
                 is_finish=False
             )
-            print(match)
             for team in teams:
                 match.team_matches.create(
                     team=team
@@ -119,8 +120,8 @@ class Stage(db.Entity):
             teams = self.get_teams(group)[:]
             n = len(teams)
             generator = self._get_matches_generator()
-            for round, teams_index in generator(n):
-                yield group, round, (teams[i] for i in teams_index)
+            for round, match, teams_index in generator(n):
+                yield group, round, match, (teams[i] for i in teams_index)
 
     def _get_matches_generator(self):
         matches_generators = {
@@ -138,9 +139,9 @@ class Stage(db.Entity):
         for round in range(1, n - (n % 2 == 0) + 1):
             for match in range(n//2):
                 if match == 0 and n % 2 == 0:
-                    yield round, (team_a, n - 1)
+                    yield round, match, (team_a, n - 1)
                 else:
-                    yield round, (team_a, team_b)
+                    yield round, match, (team_a, team_b)
                     team_b = (team_b - 1) % max_odd
                 team_a = (team_a + 1) % max_odd
 
@@ -148,20 +149,20 @@ class Stage(db.Entity):
     def first_last(n):
         # TODO: when n is odd?
         return (
-            (1, (team_a, n - team_a - 1))
-            for team_a in range(n//2)
+            (1, match, (team_a, n - team_a - 1))
+            for match, team_a in enumerate(range(n//2))
         )
 
     @staticmethod
     def random(n):
         teams = set(range(n))
         # TODO: if n is odd?
-        for _ in range(n//2):
+        for match in range(n//2):
             team_a = random.select(teams)
             teams.remove(team_a)
             team_b = random.select(teams)
             teams.remove(team_b)
-            yield (1, (team_a, team_b))
+            yield (1, match, (team_a, team_b))
 
     def get_teams(self, group):
         if self.id == 0:
@@ -177,7 +178,7 @@ class Stage(db.Entity):
         return self.matches.select(
             lambda match: match.group == group
         ).order_by(
-            lambda match: match.group
+            lambda match: match.round
         )
 
 

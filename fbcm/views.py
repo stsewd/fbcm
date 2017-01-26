@@ -269,25 +269,34 @@ def stages(championship_id):
 )
 @db_session
 def start_stage(championship_id, stage_id):
-    stage = Stage.get(id=stage_id)
+    stage = Stage.get(id=stage_id, championship=championship_id)
     if not stage or not stage.matches.is_empty():
         abort(404)
     stage.create_matches()
     return redirect(url_for('stages', championship_id=championship_id))
 
 
-@app.route('/match/<match_id>/')
+@app.route(
+    '/championship/<championship>/stage/<stage>/match/<group>/<round>/<match>/'
+)
 @db_session
-def match(match_id):
-    match = Match.get(id=match_id)
+def match(championship, stage, group, round, match):
+    stage = Stage.get(
+        id=stage, championship=championship
+    )
+    match = Match.get(
+        stage=stage, group=group, round=round, id=match
+    )
     if not match:
         return abort(404)
     form = GoalForm(match)
     return render_template('match.html', form=form, match=match)
 
 
-@app.route('/match/<match_id>/goal/')
-def goal(match_id):
+@app.route(
+    '/championship/<championship>/stage/<stage>/match/<group>/<round>/<match>/goal/'
+)
+def goal(championship, stage, group, round, match):
     pass
 
 
