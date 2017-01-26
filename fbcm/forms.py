@@ -162,7 +162,7 @@ class AddTeamToChampionshipForm(FlaskForm):
             raise ValidationError(error)
 
 
-class GoalFormBase(FlaskForm):
+class GoalForm(FlaskForm):
     class Meta:
         csrf = False
 
@@ -179,12 +179,10 @@ class GoalFormBase(FlaskForm):
     ])
 
     def validate_player(form, field):
-        pass
+        pass  # TODO
 
-
-class GoalForm(GoalFormBase):
     def __init__(self, match):
-        GoalFormBase.__init__(self)
+        FlaskForm.__init__(self)
         self.team.choices = [
             (tm.team.team.id, tm.team.team.name)
             for tm in match.team_matches
