@@ -3,15 +3,17 @@ PYTHON = python
 TEST_RUNNER = unittest
 TEST_RUNNER_ARGS = discover -v
 
+MANAGE_SCRIPT = manage.py
+
 
 run:
-	$(PYTHON) run.py server
+	$(PYTHON) $(MANAGE_SCRIPT) server
 
 test:
 	$(PYTHON) -m $(TEST_RUNNER) $(TEST_RUNNER_ARGS)
 
 populate:
-	$(PYTHON) run.py populate
+	$(PYTHON) $(MANAGE_SCRIPT) populate
 
 clean-db:
-	$(PYTHON) run.py clean_database
+	$(PYTHON) $(MANAGE_SCRIPT) clean_database
