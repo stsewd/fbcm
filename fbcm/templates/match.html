@@ -3,7 +3,13 @@
 
 
 {% block title %}
-{# team_a.name #} VS {# team_b.name #}
+  {% for team_match in match.team_matches %}
+  {% set team = team_match.team.team %}
+    {{ team.name }}
+  {% if loop.index == 1 %}
+    VS
+  {% endif %}
+  {% endfor %}
 {% endblock %}
 
 
@@ -12,6 +18,7 @@
 
 {% set stage = match.stage %}
 {% set championship = stage.championship %}
+
 
 {% block body %}
 <div>
@@ -22,10 +29,11 @@
   </h1>
   <small>
     <a href="{{ url_for('stages', championship_id=championship.id) }}?stage={{ stage.id }}&group={{ match.group }}">
-      {{ stage.name }} - Grupo {{ match.group }}
+      {{ stage.name }} - Grupo {{ match.group }} - Ronda {{ match.round }}
     </a>
   </small>
 </div>
+
 <h2>
   {% for team_match in match.team_matches %}
   {% set team = team_match.team.team %}
@@ -37,11 +45,40 @@
   {% endif %}
   {% endfor %}
 </h2>
+
+
+<h2>Goles</h2>
 <div class="btn-group">
+  {% if not match.is_finish %}
   <div class="btn btn-primary" data-toggle="modal" data-target="#{{ modal_id }}">
     Gol
   </div>
+  {% endif %}
 </div>
+
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Equipo</th>
+      <th>Jugador</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for goal in match.goals %}
+    <tr>
+      <td scope="row">
+        {{ loop.index }}
+      </td>
+      <td>
+        <a href="{{ url_for('team', id=team.id) }}">
+          {{ team.name }}
+        </a>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
 
 {% block modals %}
@@ -50,5 +87,5 @@
 
 
 {% block scripts %}
-{{ macros.js_send_request(form_id, url_for('goal', match_id=match.id), "Gol!", modal_id=modal_id) }}
+{{ macros.js_send_request(form_id, url_for('goal', championship=championship.id, stage=stage.id, group=match.group, round=match.round, match=match.id), "Gol!", modal_id=modal_id) }}
 {% endblock %}

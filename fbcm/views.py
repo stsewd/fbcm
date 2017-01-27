@@ -20,67 +20,11 @@ from .forms import (
     AddTeamToChampionshipForm
 )
 
-
-def get_first_error(form):
-    if form.errors:
-        return list(form.errors.values())[0][0]
-    else:
-        return ""
-
-
-def validate_player(team, player, number):
-    error = ""
-    if player in team.players:
-        error = "El jugador ya se encuentra registrado en el equipo."
-    elif player.team:
-        error = "El jugador ya pertenece a otro equipo."
-    elif team.players.select(lambda player: player.number == number):
-        error = "El número {} ya está ocupado.".format(number)
-
-    if error:
-        raise FbcmError(error)
-
-
-def add_default_stages(championship):
-    Stage(
-        id=0,
-        championship=championship,
-        name="Primera etapa",
-        num_groups=4,
-        algorithm='round-robin',
-        num_select=2,
-        draw=True
-    )
-
-    Stage(
-        id=1,
-        championship=championship,
-        name="Cuartos de final",
-        num_groups=4,
-        algorithm="first-last",
-        num_select=1,
-        draw=False
-    )
-
-    Stage(
-        id=2,
-        championship=championship,
-        name="Semifinal",
-        num_groups=2,
-        algorithm="random",
-        num_select=1,
-        draw=False
-    )
-
-    Stage(
-        id=3,
-        championship=championship,
-        name="Final",
-        num_groups=1,
-        algorithm="random",
-        num_select=1,
-        draw=False
-    )
+from .tools import (
+    add_default_stages,
+    get_first_error,
+    validate_player
+)
 
 
 @app.route('/')
@@ -93,7 +37,11 @@ def index():
 def players():
     players = Player.select()
     form = PlayerForm()
-    return render_template('players.html', players=players, form=form)
+    return render_template(
+        'players.html',
+        players=players,
+        form=form
+    )
 
 
 @app.route('/player/<id>/')
@@ -120,9 +68,11 @@ def add_player():
 @app.route('/teams/')
 @db_session
 def teams():
-    teams = Team.select()
-    form = TeamForm()
-    return render_template('teams.html', teams=teams, form=form)
+    return render_template(
+        'teams.html',
+        teams=Team.select(),
+        form=TeamForm()
+    )
 
 
 @app.route('/team/<id>/')
@@ -130,8 +80,11 @@ def teams():
 def team(id):
     team = Team.get(id=id)
     if team:
-        form = AddPlayerToTeamForm()
-        return render_template('team.html', team=team, form=form)
+        return render_template(
+            'team.html',
+            team=team,
+            form=AddPlayerToTeamForm()
+        )
     else:
         abort(404)
 
@@ -150,7 +103,7 @@ def add_player_to_team(id):
         validate_player(team, player, number)
         player.set(
             number=number,
-            position=Position.get(id=position),
+            position=Position[position],
             team=team
         )
         return redirect(url_for('teams', id=id))
@@ -172,12 +125,10 @@ def add_team():
 @app.route('/championships/')
 @db_session
 def championships():
-    championships = Championship.select()
-    form = ChampionshipForm()
     return render_template(
         'championships.html',
-        championships=championships,
-        form=form
+        championships=Championship.select(),
+        form=ChampionshipForm()
     )
 
 
@@ -202,16 +153,15 @@ def add_team_to_championship(id):
     form = AddTeamToChampionshipForm()
     if form.validate_on_submit():
         team_name = form.team_name.data
-
         championship = Championship[id]
         team = Team.get(name=team_name)
 
-        if championship.teams.select(lambda teamc: teamc.team == team):
+        if championship.teams.select(lambda tc: tc.team == team):
             raise FbcmError(
                 "El equipo ya se encuentra registrado en el campeonato."
             )
-
-        championship.teams.create(team=team)
+        else:
+            championship.teams.create(team=team)
         return redirect(url_for('championships', id=id))
     else:
         raise FbcmError(get_first_error(form))
@@ -277,15 +227,16 @@ def start_stage(championship_id, stage_id):
 
 
 @app.route(
-    '/championship/<championship>/stage/<stage>/match/<group>/<round>/<match>/'
+    '/championship/<championship>/stage/<stage>/' +
+    'match/<group>/<round>/<match>/'
 )
 @db_session
 def match(championship, stage, group, round, match):
-    stage = Stage.get(
-        id=stage, championship=championship
-    )
     match = Match.get(
-        stage=stage, group=group, round=round, id=match
+        stage=Stage[stage, championship],
+        group=group,
+        round=round,
+        id=match
     )
     if not match:
         return abort(404)
@@ -294,7 +245,8 @@ def match(championship, stage, group, round, match):
 
 
 @app.route(
-    '/championship/<championship>/stage/<stage>/match/<group>/<round>/<match>/goal/'
+    '/championship/<championship>/' +
+    'stage/<stage>/match/<group>/<round>/<match>/goal/'
 )
 def goal(championship, stage, group, round, match):
     pass

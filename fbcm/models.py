@@ -81,6 +81,11 @@ class Match(db.Entity):
     is_finish = orm.Required(bool, default=False)
     orm.PrimaryKey(id, stage, group, round)
 
+    @property
+    def goals(self):
+        # TODO
+        return []
+
 
 class Goal(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
@@ -103,7 +108,6 @@ class Stage(db.Entity):
         if not self.matches.is_empty():
             raise FbcmError("Etapa ya comenzada")
         for group, round, match, teams in self._generate_matches():
-            print(group, round, teams)
             match = self.matches.create(
                 id=match,
                 group=group,
@@ -124,6 +128,11 @@ class Stage(db.Entity):
                 yield group, round, match, (teams[i] for i in teams_index)
 
     def _get_matches_generator(self):
+        """All generators must be return a:
+            - round
+            - match and
+            - teams
+        """
         matches_generators = {
             'round-robin': Stage.round_robin,
             'first-last': Stage.first_last,
@@ -168,8 +177,11 @@ class Stage(db.Entity):
         if self.id == 0:
             teams = self.championship.teams
             return teams.order_by(
-                lambda team_match: team_match.team.name
-            ).page(group, pagesize=math.ceil(len(teams)/self.num_groups))
+                lambda tm: tm.team.name
+            ).page(
+                group,
+                pagesize=math.ceil(len(teams)/self.num_groups)
+            )
         else:
             # TODO
             return []
