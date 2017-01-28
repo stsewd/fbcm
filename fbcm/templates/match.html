@@ -40,11 +40,19 @@
   <a href="{{ url_for('team', id=team.id) }}">
     {{ team.name }}
   </a>
+  -
+  {{ team_match.goals.count() }}
   {% if loop.index == 1 %}
-  VS
+    VS
   {% endif %}
   {% endfor %}
 </h2>
+
+<div class="btn-group">
+  <button class="btn btn-danger">
+    Finalizar
+  </button>
+</div>
 
 
 <h2>Goles</h2>
@@ -65,7 +73,7 @@
     </tr>
   </thead>
   <tbody>
-    {% for goal in match.goals %}
+    {% for team, goal in match.goals %}
     <tr>
       <td scope="row">
         {{ loop.index }}
@@ -73,6 +81,11 @@
       <td>
         <a href="{{ url_for('team', id=team.id) }}">
           {{ team.name }}
+        </a>
+      </td>
+      <td>
+        <a href="{{ url_for('player', id=goal.player.id) }}">
+          {{ goal.player.name }} {{ goal.player.lastname }}
         </a>
       </td>
     </tr>

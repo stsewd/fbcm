@@ -1,4 +1,4 @@
-from pony.orm import db_session
+from pony.orm import db_session, select
 from flask import (
     abort, jsonify, redirect,
     render_template, url_for,
@@ -246,10 +246,38 @@ def match(championship, stage, group, round, match):
 
 @app.route(
     '/championship/<championship>/' +
-    'stage/<stage>/match/<group>/<round>/<match>/goal/'
+    'stage/<stage>/match/<group>/<round>/<match>/goal/',
+    methods=['POST']
 )
+@db_session
 def goal(championship, stage, group, round, match):
-    pass
+    player = request.form['player']
+    team = request.form['team']
+    team_match = select(
+        tm
+        for c in Championship
+        for s in c.stages
+        for m in s.matches
+        for tm in m.team_matches
+        if (c.id == championship and
+            s.id == stage and
+            m.id == match and
+            m.group == group and
+            m.round == round and
+            tm.team.team == Team[team])
+    ).first()
+    team_match.goals.create(
+        player=player
+    )
+
+    return redirect(url_for(
+        'match',
+        championship=championship,
+        stage=stage,
+        group=group,
+        round=round,
+        match=match
+    ))
 
 
 @app.errorhandler(FbcmError)

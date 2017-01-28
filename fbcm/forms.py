@@ -178,12 +178,12 @@ class GoalForm(FlaskForm):
         DataRequired(message="Jugador faltante.")
     ])
 
-    def validate_player(form, field):
-        pass  # TODO
-
     def __init__(self, match):
         FlaskForm.__init__(self)
         self.team.choices = [
             (tm.team.team.id, tm.team.team.name)
             for tm in match.team_matches
         ]
+
+    def validate_player(form, field):
+        pass  # TODO

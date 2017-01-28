@@ -84,8 +84,12 @@ class Match(db.Entity):
 
     @property
     def goals(self):
-        # TODO
-        return []
+        return select(
+            (tm.team.team, goal)
+            for tm in TeamMatch
+            for goal in tm.goals
+            if tm.match == self
+        ).prefetch(Player)
 
 
 class Goal(db.Entity):
