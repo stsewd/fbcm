@@ -73,8 +73,7 @@
           </tr>
         </thead>
         <tbody>
-          {% for team_championship in stage.get_teams(group) %}
-          {% set team = team_championship.team %}
+          {% for team in stage.get_teams(group) %}
           <tr>
             <td scope="row">
               {{ loop.index }}

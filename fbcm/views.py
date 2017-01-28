@@ -190,16 +190,12 @@ def stages(championship_id):
     stage_id = int(request.args.get('stage', '0'))
     group = int(request.args.get('group', '1'))
 
-    championship = Championship.get(id=championship_id)
-    if not championship:
-        abort(404)
-
-    stage = championship.stages.select(
-        lambda stage: stage.id == stage_id
+    stage = Stage.get(
+        id=stage_id,
+        championship=championship_id
     )
     if not stage:
         abort(404)
-    stage = stage[:1][0]
 
     if not (0 < group <= stage.num_groups):
         abort(404)
@@ -208,7 +204,11 @@ def stages(championship_id):
         "stage.html",
         stage=stage,
         group=group,
-        stages=championship.stages.select().order_by(
+        stages=Stage.select(
+            lambda s: s.championship.id == championship_id
+        ).prefetch(
+            Championship
+        ).order_by(
             lambda stage: stage.id
         )
     )

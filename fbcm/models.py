@@ -2,6 +2,7 @@ import math
 import random
 
 from pony import orm
+from pony.orm import select
 
 from . import app
 
@@ -175,9 +176,13 @@ class Stage(db.Entity):
 
     def get_teams(self, group):
         if self.id == 0:
-            teams = self.championship.teams
+            teams = select(
+                tc.team
+                for tc in TeamChampionship
+                if tc.championship == self.championship
+            )
             return teams.order_by(
-                lambda tm: tm.team.name
+                lambda t: t.name
             ).page(
                 group,
                 pagesize=math.ceil(len(teams)/self.num_groups)
@@ -187,8 +192,9 @@ class Stage(db.Entity):
             return []
 
     def get_matches(self, group):
-        return self.matches.select(
-            lambda match: match.group == group
+        return select(
+            m for m in Match
+            if m.group == group and m.stage == self
         ).order_by(
             lambda match: match.round
         )
