@@ -88,3 +88,26 @@ from
         nd.`group` = tg.`group` and
         nd.`round` = tg.`round` and
         nd.goals = tg.goals;
+
+
+create or replace view `draws` as
+select
+    tg_a.team,
+    tg_a.championship,
+    tg_a.`stage`,
+    tg_a.`group`,
+    tg_a.`round`,
+    tg_a.`match`,
+    tg_a.goals
+from
+    team_goals tg_a
+    join team_goals tg_b
+    on
+        tg_a.championship = tg_b.championship and
+        tg_a.`match` = tg_b.`match` and
+        tg_a.stage = tg_b.stage and
+        tg_a.`group` = tg_b.`group` and
+        tg_a.`round` = tg_b.`round` and
+        tg_a.goals = tg_b.goals
+where
+    tg_a.team != tg_b.team;
