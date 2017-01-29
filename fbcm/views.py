@@ -280,6 +280,37 @@ def goal(championship, stage, group, round, match):
     ))
 
 
+@app.route(
+    '/championship/<championship>/' +
+    'stage/<stage>/match/<group>/<round>/<match>/finish/',
+    methods=['POST']
+)
+@db_session
+def finish_match(championship, stage, group, round, match):
+    match_ = select(
+        m
+        for c in Championship
+        for s in c.stages
+        for m in s.matches
+        if (c.id == championship and
+            s.id == stage and
+            m.id == match and
+            m.group == group and
+            m.round == round)
+    ).first()
+
+    match_.is_finish = True
+
+    return redirect(url_for(
+        'match',
+        championship=championship,
+        stage=stage,
+        group=group,
+        round=round,
+        match=match
+    ))
+
+
 @app.errorhandler(FbcmError)
 def fbcm_error_handler(error):
     response = jsonify(error.to_dict())

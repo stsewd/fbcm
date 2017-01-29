@@ -15,6 +15,8 @@
 
 {% set form_id = 'form-add-goal' %}
 {% set modal_id = 'modal-add-goal' %}
+{% set modal_confirm_id = 'modal-finish-match'%}
+{% set form_confirm_id = 'form-finish-match'%}
 
 {% set stage = match.stage %}
 {% set championship = stage.championship %}
@@ -41,7 +43,7 @@
     {{ team.name }}
   </a>
   -
-  {{ team_match.goals.count() }}
+  <strong>{{ team_match.goals.count() }}</strong>
   {% if loop.index == 1 %}
     VS
   {% endif %}
@@ -49,9 +51,11 @@
 </h2>
 
 <div class="btn-group">
-  <button class="btn btn-danger">
+  {% if not match.is_finish %}
+  <button class="btn btn-warning" data-toggle="modal", data-target="#{{ modal_confirm_id }}">
     Finalizar
   </button>
+  {% endif %}
 </div>
 
 
@@ -96,9 +100,44 @@
 
 {% block modals %}
 {{ macros.make_modal_from_form("Agregar Gol", modal_id, form, form_id) }}
+
+{{ macros.make_confirm_modal(
+  "¿Finalizar Partido?",
+  modal_confirm_id,
+  form_confirm_id,
+  'Al finalizar el partido ya no podrá agregar más goles. Esta acción es irreversible.',
+  'Si, finalizar partido')
+}}
 {% endblock %}
 
 
 {% block scripts %}
-{{ macros.js_send_request(form_id, url_for('goal', championship=championship.id, stage=stage.id, group=match.group, round=match.round, match=match.id), "Gol!", modal_id=modal_id) }}
+{{ macros.js_send_request(
+  form_id,
+  url_for(
+    'goal',
+    championship=championship.id,
+    stage=stage.id,
+    group=match.group,
+    round=match.round,
+    match=match.id
+  ),
+  "Gol!",
+  modal_id=modal_id)
+}}
+
+
+{{ macros.js_send_request(
+  form_confirm_id,
+  url_for(
+    'finish_match',
+    championship=championship.id,
+    stage=stage.id,
+    group=match.group,
+    round=match.round,
+    match=match.id
+  ),
+  "Partido finalizado",
+  modal_id=modal_confirm_id)
+}}
 {% endblock %}

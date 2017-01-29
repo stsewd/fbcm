@@ -39,6 +39,33 @@
 {%- endmacro %}
 
 
+{% macro make_confirm_modal(title, id, form_id, body, accept="Aceptar", cancel="Cancelar", action_type="danger") %}
+<div id="{{ id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{ title }}</h4>
+      </div>
+      <form id="{{ form_id }}">
+        <div class="modal-body">
+          {{ body }}
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-{{ action_type }}">
+            {{ accept }}
+          </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            {{ cancel }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+
 {% macro js_send_request(form_id, url, message, type="POST", modal_id=None) -%}
 <script>
   sendRequest('#{{ form_id }}', '{{ type }}', '{{ url }}', function (data, status) {
