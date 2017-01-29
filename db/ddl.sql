@@ -33,3 +33,36 @@ group by
     tm.match_id,
     tm.match_group,
     tm.match_round;
+
+
+create or replace view `no_draws` as
+select
+    championship, `match`, stage, `group`, `round`, goals
+from
+    team_goals
+group by
+    championship, `match`, stage, `group`, `round`, goals
+having
+    count(*) = 1;
+
+
+create or replace view `winners` as
+select
+    tg.team, nd.*
+from
+    team_goals tg
+    join (
+        select
+        championship, `match`, stage, `group`, `round`, max(goals) goals
+        from
+            no_draws
+        group by
+            championship, `match`, stage, `group`, `round`
+    ) nd
+    on
+        nd.championship = tg.championship and
+        nd.`match` = tg.`match` and
+        nd.stage = tg.stage and
+        nd.`group` = tg.`group` and
+        nd.`round` = tg.`round` and
+        nd.goals = tg.goals;
