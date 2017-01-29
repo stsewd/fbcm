@@ -66,3 +66,25 @@ from
         nd.`group` = tg.`group` and
         nd.`round` = tg.`round` and
         nd.goals = tg.goals;
+
+
+create or replace view `losers` as
+select
+    tg.team, nd.*
+from
+    team_goals tg
+    join (
+        select
+        championship, `match`, stage, `group`, `round`, min(goals) goals
+        from
+            no_draws
+        group by
+            championship, `match`, stage, `group`, `round`
+    ) nd
+    on
+        nd.championship = tg.championship and
+        nd.`match` = tg.`match` and
+        nd.stage = tg.stage and
+        nd.`group` = tg.`group` and
+        nd.`round` = tg.`round` and
+        nd.goals = tg.goals;
