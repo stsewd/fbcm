@@ -51,7 +51,7 @@
 </h2>
 
 <div class="btn-group">
-  {% if not match.is_finish %}
+  {% if match.state == 'started'%}
   <button class="btn btn-warning" data-toggle="modal", data-target="#{{ modal_confirm_id }}">
     Finalizar
   </button>

@@ -73,7 +73,9 @@
           </tr>
         </thead>
         <tbody>
-          {% for team in stage.get_teams(group) %}
+          {% for team, pg, pe, pp, gf, gc, points in stage.get_table(group) %}
+          {% set pj = pg + pe + pp %}
+          {% set gd = gf - gc %}
           <tr>
             <td scope="row">
               {{ loop.index }}
@@ -83,14 +85,30 @@
                 {{ team.name }}
               </a>
             </td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td>
+              {{ pj }}
+            </td>
+            <td>
+              {{ pg }}
+            </td>
+            <td>
+              {{ pe }}
+            </td>
+            <td>
+              {{ pp }}
+            </td>
+            <td>
+              {{ gf }}
+            </td>
+            <td>
+              {{ gc }}
+            </td>
+            <td>
+              {{ gd }}
+            </td>
+            <td>
+              <strong>{{ points }}</strong>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -127,7 +145,6 @@
           <td>Gol diferencia (GF - GC)</td>
         </tr>
       </table>
-      
     </div>
 
     <div id="matches" class="tab-pane fade">

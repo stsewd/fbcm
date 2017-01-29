@@ -299,7 +299,7 @@ def finish_match(championship, stage, group, round, match):
             m.round == round)
     ).first()
 
-    match_.is_finish = True
+    match_.state = 'finished'
 
     return redirect(url_for(
         'match',

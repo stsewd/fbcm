@@ -2,7 +2,7 @@ import math
 import random
 
 from pony import orm
-from pony.orm import select
+from pony.orm import select, count
 
 from . import app
 
@@ -79,7 +79,7 @@ class Match(db.Entity):
     group = orm.Required(int)
     round = orm.Required(int)
     team_matches = orm.Set('TeamMatch')  # Just two
-    is_finish = orm.Required(bool, default=False)
+    state = orm.Required(str, default='not_started')  # not_started, started, finished
     orm.PrimaryKey(id, stage, group, round)
 
     @property
@@ -90,6 +90,23 @@ class Match(db.Entity):
             for goal in tm.goals
             if tm.match == self
         ).prefetch(Player)
+
+    @property
+    def score(self):
+        return select(
+            (tm, tm.goals.count())
+            for tm in TeamMatch
+            if tm.match == self.match
+        ).order_by(
+            lambda tm_goals: tm_goals[1]
+        )
+
+    @property
+    def is_draw(self):
+        return len(set(
+            goals
+            for team, goals in self.score
+        )) == self.score.count()
 
 
 class Goal(db.Entity):
@@ -117,7 +134,7 @@ class Stage(db.Entity):
                 id=match,
                 group=group,
                 round=round,
-                is_finish=False
+                state="not_finished"
             )
             for team in teams:
                 match.team_matches.create(
@@ -126,7 +143,7 @@ class Stage(db.Entity):
 
     def _generate_matches(self):
         for group in range(1, self.num_groups + 1):
-            teams = self.get_teams(group)[:]
+            teams = self.get_teams_matches(group)[:]
             n = len(teams)
             generator = self._get_matches_generator()
             for round, match, teams_index in generator(n):
@@ -178,15 +195,40 @@ class Stage(db.Entity):
             teams.remove(team_b)
             yield (1, match, (team_a, team_b))
 
-    def get_teams(self, group):
+    def get_table(self, group):
+        table = {}
+        for match in self.matches:
+            for team_m in match.team_matches:
+                row = table.setdefault(team_m.team.team, {})
+                row['pj'] = row.get('pj', 0) + 1
+                row['pj'] = row.get('pj', 0) + 1
+
+        return select(
+            (
+                team,
+                count(team),
+                count(team),
+                count(team),
+                count(team),
+                count(team),
+                count(team)
+            )
+            for m in Match
+            for tm in m.team_matches
+            for team in Team
+            if (m.stage == self and m.group == group and
+                tm.team.team == team)
+        )
+
+    def get_teams_matches(self, group):
         if self.id == 0:
             teams = select(
-                tc.team
+                tc
                 for tc in TeamChampionship
                 if tc.championship == self.championship
             )
             return teams.order_by(
-                lambda t: t.name
+                lambda tc: tc.team.name
             ).page(
                 group,
                 pagesize=math.ceil(len(teams)/self.num_groups)
@@ -209,6 +251,17 @@ class TeamMatch(db.Entity):
     match = orm.Required(Match)
     goals = orm.Set(Goal)
     orm.PrimaryKey(team, match)
+
+    @property
+    def is_draw(self):
+        return self.match.is_draw
+
+    @property
+    def is_winner(self):
+        if not self.is_draw:
+            return self.match.score[:1] == self.team
+        else:
+            raise FbcmError("Es un empate!")
 
 
 class TeamChampionship(db.Entity):
