@@ -1,4 +1,6 @@
-from .models import Stage, FbcmError
+from pony.orm import select
+
+from .models import Stage, FbcmError, Championship
 
 
 def add_default_stages(championship):
@@ -61,3 +63,17 @@ def validate_player(team, player, number):
 
     if error:
         raise FbcmError(error)
+
+
+def get_match(championship, stage, group, round, match):
+    return select(
+        m
+        for c in Championship
+        for s in c.stages
+        for m in s.matches
+        if (c.id == championship and
+            s.id == stage and
+            m.id == match and
+            m.group == group and
+            m.round == round)
+    ).first()

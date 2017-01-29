@@ -23,7 +23,8 @@ from .forms import (
 from .tools import (
     add_default_stages,
     get_first_error,
-    validate_player
+    validate_player,
+    get_match
 )
 
 
@@ -287,18 +288,7 @@ def goal(championship, stage, group, round, match):
 )
 @db_session
 def start_match(championship, stage, group, round, match):
-    match_ = select(
-        m
-        for c in Championship
-        for s in c.stages
-        for m in s.matches
-        if (c.id == championship and
-            s.id == stage and
-            m.id == match and
-            m.group == group and
-            m.round == round)
-    ).first()
-
+    match_ = get_match(championship, stage, group, round, match)
     match_.state = 'started'
 
     return redirect(url_for(
@@ -318,18 +308,7 @@ def start_match(championship, stage, group, round, match):
 )
 @db_session
 def finish_match(championship, stage, group, round, match):
-    match_ = select(
-        m
-        for c in Championship
-        for s in c.stages
-        for m in s.matches
-        if (c.id == championship and
-            s.id == stage and
-            m.id == match and
-            m.group == group and
-            m.round == round)
-    ).first()
-
+    match_ = get_match(championship, stage, group, round, match)
     match_.state = 'finished'
 
     return redirect(url_for(

@@ -160,7 +160,15 @@
         </thead>
         <tbody>
           {% for match in stage.get_matches(group) %}
-          {% set bg = "bg-success" if match.is_finish else "" %}
+          {% set state = match.state %}
+          {% if state == 'finished' %}
+            {% set bg = "bg-success" %}
+          {% elif state == 'started' %}
+            {% set bg = "bg-warning" %}
+          {% else %}
+            {% set bg = "" %}
+          {% endif %}
+
           <tr class="{{ bg }}">
             <td scope="row">
               {{ loop.index }}
@@ -193,6 +201,9 @@
       <table class="table table-condensed text-muted">
         <tr>
           <td class="bg-default">Partido por jugar</td>
+        </tr>
+        <tr>
+          <td class="bg-warning">Partido en progreso</td>
         </tr>
         <tr>
           <td class="bg-success">Partido jugado</td>
