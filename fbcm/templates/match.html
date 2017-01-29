@@ -17,6 +17,8 @@
 {% set modal_id = 'modal-add-goal' %}
 {% set modal_confirm_id = 'modal-finish-match'%}
 {% set form_confirm_id = 'form-finish-match'%}
+{% set modal_start = 'modal-start-match'%}
+{% set form_start = 'form-start-match'%}
 
 {% set stage = match.stage %}
 {% set championship = stage.championship %}
@@ -51,9 +53,14 @@
 </h2>
 
 <div class="btn-group">
-  {% if match.state == 'started'%}
+  {% set state = match.state %}
+  {% if state == 'started'%}
   <button class="btn btn-warning" data-toggle="modal", data-target="#{{ modal_confirm_id }}">
     Finalizar
+  </button>
+  {% elif state == 'not_started'%}
+  <button class="btn btn-primary" data-toggle="modal", data-target="#{{ modal_start }}">
+    Iniciar
   </button>
   {% endif %}
 </div>
@@ -61,7 +68,7 @@
 
 <h2>Goles</h2>
 <div class="btn-group">
-  {% if not match.is_finish %}
+  {% if match.state == 'started' %}
   <div class="btn btn-primary" data-toggle="modal" data-target="#{{ modal_id }}">
     Gol
   </div>
@@ -108,6 +115,14 @@
   'Al finalizar el partido ya no podrá agregar más goles. Esta acción es irreversible.',
   'Si, finalizar partido')
 }}
+
+{{ macros.make_confirm_modal(
+  "¿Iniciar Partido?",
+  modal_start,
+  form_start,
+  'Al iniciar el partido la tabla de posiciones será actualizada, esta acción es irreversible.',
+  'Si, iniciar partido')
+}}
 {% endblock %}
 
 
@@ -126,7 +141,6 @@
   modal_id=modal_id)
 }}
 
-
 {{ macros.js_send_request(
   form_confirm_id,
   url_for(
@@ -139,5 +153,19 @@
   ),
   "Partido finalizado",
   modal_id=modal_confirm_id)
+}}
+
+{{ macros.js_send_request(
+  form_start,
+  url_for(
+    'start_match',
+    championship=championship.id,
+    stage=stage.id,
+    group=match.group,
+    round=match.round,
+    match=match.id
+  ),
+  "Jueguen Muchachos!",
+  modal_id=modal_start)
 }}
 {% endblock %}

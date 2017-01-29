@@ -79,7 +79,8 @@ class Match(db.Entity):
     group = orm.Required(int)
     round = orm.Required(int)
     team_matches = orm.Set('TeamMatch')  # Just two
-    state = orm.Required(str, default='not_started')  # not_started, started, finished
+    # not_started, started, finished
+    state = orm.Required(str, default='not_started')
     orm.PrimaryKey(id, stage, group, round)
 
     @property
@@ -133,8 +134,7 @@ class Stage(db.Entity):
             match = self.matches.create(
                 id=match,
                 group=group,
-                round=round,
-                state="not_finished"
+                round=round
             )
             for team in teams:
                 match.team_matches.create(
