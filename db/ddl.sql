@@ -123,9 +123,17 @@ select
     count(Null) as pp,
     count(Null) as pe,
     sum(w.goals) as gf,
-    sum(0) as gc
+    sum(l.goals) as gc
 from
     winners as w
+    left join losers l
+    on
+        w.championship = l.championship and
+        w.`match` = l.`match` and
+        w.stage = l.stage and
+        w.`group` = l.`group` and
+        w.`round` = l.`round` and
+        w.goals > l.goals
 group by
     w.team,
     w.championship,
@@ -142,10 +150,18 @@ select
     count(Null) as pg,
     count(l.goals) as pp,
     count(Null) as pe,
-    sum(0) as gf,
-    sum(l.goals) as gc
+    sum(l.goals) as gf,
+    sum(w.goals) as gc
 from
     losers as l
+    left join winners w
+    on
+        l.championship = w.championship and
+        l.`match` = w.`match` and
+        l.stage = w.stage and
+        l.`group` = w.`group` and
+        l.`round` = w.`round` and
+        l.goals < w.goals
 group by
     l.team,
     l.championship,
