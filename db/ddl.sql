@@ -111,3 +111,64 @@ from
         tg_a.goals = tg_b.goals
 where
     tg_a.team != tg_b.team;
+
+
+create or replace view `positions_table` as
+select
+    w.team,
+    w.championship,
+    w.stage,
+    w.`group`,
+    count(w.goals) as pg,
+    count(Null) as pp,
+    count(Null) as pe,
+    sum(w.goals) as gf,
+    sum(0) as gc
+from
+    winners as w
+group by
+    w.team,
+    w.championship,
+    w.stage,
+    w.`group`
+
+UNION
+    
+select
+    l.team,
+    l.championship,
+    l.stage,
+    l.`group`,
+    count(Null) as pg,
+    count(l.goals) as pp,
+    count(Null) as pe,
+    sum(0) as gf,
+    sum(l.goals) as gc
+from
+    losers as l
+group by
+    l.team,
+    l.championship,
+    l.stage,
+    l.`group`
+
+UNION
+
+select
+    d.team,
+    d.championship,
+    d.stage,
+    d.`group`,
+    count(Null) as pg,
+    count(Null) as pp,
+    count(d.goals) as pe,
+    sum(d.goals) as gf,
+    sum(d.goals) as gc
+from
+    draws as d
+group by
+    d.team,
+    d.championship,
+    d.stage,
+    d.`group`;
+
