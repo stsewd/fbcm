@@ -112,7 +112,7 @@ class Match(db.Entity):
 
 class Goal(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
-    player = orm.Required(Player)  # Reverse to player of CompetinTeam
+    player = orm.Required(Player)
     team_match = orm.Required('TeamMatch')
 
 
@@ -123,7 +123,7 @@ class Stage(db.Entity):
     num_groups = orm.Required(int)
     algorithm = orm.Required(str)  # Algorithm for make the rounds
     num_select = orm.Required(int)  # number of winners for next stage
-    draw = orm.Required(bool, default=True)  # Permitir empates?
+    draw = orm.Required(bool, default=True)  # Allow draws?
     matches = orm.Set(Match)
     orm.PrimaryKey(id, championship)
 
@@ -143,11 +143,15 @@ class Stage(db.Entity):
 
     def _generate_matches(self):
         for group in range(1, self.num_groups + 1):
-            teams = self.get_teams_matches(group)[:]
-            n = len(teams)
-            generator = self._get_matches_generator()
-            for round, match, teams_index in generator(n):
-                yield group, round, match, (teams[i] for i in teams_index)
+            for it in self.pre_generate_matches(group):
+                yield it
+
+    def pre_generate_matches(self, group):
+        teams = self.get_teams_matches(group)[:]
+        n = len(teams)
+        generator = self._get_matches_generator()
+        for round, match, teams_index in generator(n):
+            yield group, round, match, (teams[i] for i in teams_index)
 
     def _get_matches_generator(self):
         """All generators must be return a:
@@ -196,17 +200,20 @@ class Stage(db.Entity):
             yield (1, match, (team_a, team_b))
 
     def get_table(self, group):
-        championship = self.championship.id
+        championship_id = self.championship.id
         stage = self.id
-        result = db.select("""SELECT * from positions_table
-            WHERE championship=$championship and
-            stage=$stage and `group`=$group
-        """)
 
         championship = self.championship
         pwinner = championship.points_winner
         ploser = championship.points_loser
         pdraw = championship.points_draw
+
+        result = db.select("""SELECT * FROM positions_table
+            WHERE championship=$championship_id and
+            stage=$stage and `group`=$group
+            ORDER BY pg * $pwinner + pp * $ploser + pe * $pdraw DESC,
+            gf - gc DESC, gf DESC, gc ASC
+            """)
         for r in result:
             team, championship, stage, group, pg, pp, pe, gf, gc = r
             yield (
@@ -230,8 +237,24 @@ class Stage(db.Entity):
                 pagesize=math.ceil(len(teams)/self.num_groups)
             )
         else:
-            # TODO
-            return []
+            prev_stage = Stage.get(
+                id=self.id - 1,
+                championship=self.championship
+            )
+            return [
+                TeamChampionship.get(
+                    team=row[0],
+                    championship=self.championship
+                )
+                for row in prev_stage.get_winners()
+            ]
+
+    def get_winners(self):
+        for group in range(self.num_groups):
+            table = self.get_table(group)
+            [next(table) for _ in range(self.num_select)].sort(
+                lambda t: (t[6], t[4] - t[5], t[4], 9999 - t[5])
+            )
 
     def get_matches(self, group):
         return select(
@@ -239,6 +262,13 @@ class Stage(db.Entity):
             if m.group == group and m.stage == self
         ).order_by(
             lambda match: match.round
+        )
+
+    @property
+    def is_finish(self):
+        return all(
+            m.status == 'finished'
+            for m in self.matches
         )
 
 
