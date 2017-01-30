@@ -206,6 +206,25 @@ group by
     t.`group`;
 
 
+create or replace view `top_players` as
+select
+    p.id, g.team_match_team_championship as championship, count(g.id) goals
+from
+    person p
+    join goal g
+    on 
+        g.player = p.id
+group by
+    p.id, g.team_match_team_championship
+order by
+    goals desc
+limit
+    10;
+
+    
+    
+    
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_position_table`(
 	IN championship_id varchar(10),
     IN stage_id varchar(10),
