@@ -289,7 +289,7 @@ class Stage(db.Entity):
             ]
             if self.algorithm == 'first-last':
                 n = len(winners)
-                if n//2 < group - 1:
+                if n//2 <= group - 1:
                     return []
                 else:
                     first = winners[group - 1]
