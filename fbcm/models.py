@@ -299,9 +299,9 @@ class Stage(db.Entity):
                         return [first]
             elif self.algorithm == 'random':
                 random.Random(4).shuffle(winners)
-                n = len(winners)//self.num_groups
+                n = 2  # len(winners)//self.num_groups
                 l = (group - 1) * n
-                r = (group + n)
+                r = (l + n)
                 return winners[l:r]
 
     def get_winners(self):
