@@ -1,0 +1,53 @@
+{% import "macros.html" as macros %}
+{% extends "layout.html" %}
+
+{% block title %}{{ championship.name }} - TOP Jugadores {% endblock %}
+
+
+{% block body %}
+<h1>
+  <a href="{{ url_for('top', championship=championship.id) }}">
+    TOP Jugadores
+  </a>
+</h1>
+
+<h2>
+  <a href="{{ url_for('championship', id=championship.id) }}">
+    {{ championship.name }}
+  </a>
+</h2>
+<table class="table table-striped table-hover">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nombre</th>
+      <th>Equipo</th>
+      <th>Goles</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for player, goals in championship.top_players %}
+    {% set team = player.team %}
+    <tr>
+      <td scope="row">
+        {{ loop.index }}
+      </td>
+      <td>
+        <a href="{{ url_for('player', id=player.id) }}">
+          {{ player.name }} {{ player.lastname }}
+        </a>
+      </td>
+      <td>
+        <a href="{{ url_for('team', id=team.id) }}">
+          {{ team.name }}
+        </a>
+      </td>
+      <td>
+        {{ goals }}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}

@@ -321,6 +321,15 @@ def finish_match(championship, stage, group, round, match):
     ))
 
 
+@app.route('/championship/<championship>/top/')
+@db_session
+def top(championship):
+    ch = Championship.get(id=championship)
+    if not ch:
+        abort(404)
+    return render_template('top-players.html', championship=ch)
+
+
 @app.errorhandler(FbcmError)
 def fbcm_error_handler(error):
     response = jsonify(error.to_dict())

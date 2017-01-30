@@ -37,7 +37,9 @@
     Explorar
   </a>
   {% endif %}
-  <buttom class="btn btn-secondary" disabled>Top Jugadores</buttom>
+  <a href="{{ url_for('top', championship=championship.id) }}" class="btn btn-secondary">
+    Top Jugadores
+  </a>
 </div>
 
 <h2>Equipos</h2>

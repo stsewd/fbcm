@@ -8,6 +8,7 @@ from . import app
 
 
 db = orm.Database()
+random.seed(4)
 
 
 class FbcmError(Exception):
@@ -69,8 +70,21 @@ class Championship(db.Entity):
         if stage.matches.is_empty():
             return "not_started"
         else:
-            return "started"
-        return "finished"  # TODO
+            return (
+                "finished"
+                if all(s.is_finish for s in self.stages)
+                else "started"
+            )
+
+    @property
+    def top_players(self):
+        return select(
+            (p, orm.count(g.id))
+            for p in Player
+            for g in Goal
+            if g.team_match.team.championship.id == self.id
+            and g.player == p
+        ).order_by(orm.desc(2)).limit(10)
 
 
 class Match(db.Entity):
@@ -197,13 +211,14 @@ class Stage(db.Entity):
 
     @staticmethod
     def random(n):
-        teams = set(range(n))
+        teams = list(range(n))
+        random.Random(4).shuffle(teams)
         # TODO: if n is odd?
+        i = 0
         for match in range(n//2):
-            team_a = random.select(teams)
-            teams.remove(team_a)
-            team_b = random.select(teams)
-            teams.remove(team_b)
+            team_a = teams[i]
+            team_b = teams[i + 1]
+            i += 2
             yield (1, match, (team_a, team_b))
 
     def get_table(self, group):
@@ -266,8 +281,11 @@ class Stage(db.Entity):
                     else:
                         return [first]
             elif self.algorithm == 'random':
-                # TODO
-                return []
+                random.Random(4).shuffle(winners)
+                n = len(winners)//self.num_groups
+                l = (group - 1) * n
+                r = (group + n)
+                return winners[l:r]
 
     def get_winners(self):
         result = [
