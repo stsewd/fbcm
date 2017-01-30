@@ -2,7 +2,7 @@ import math
 import random
 
 from pony import orm
-from pony.orm import select, count
+from pony.orm import select
 
 from . import app
 
@@ -196,29 +196,25 @@ class Stage(db.Entity):
             yield (1, match, (team_a, team_b))
 
     def get_table(self, group):
-        table = {}
-        for match in self.matches:
-            for team_m in match.team_matches:
-                row = table.setdefault(team_m.team.team, {})
-                row['pj'] = row.get('pj', 0) + 1
-                row['pj'] = row.get('pj', 0) + 1
+        championship = self.championship.id
+        stage = self.id
+        result = db.select("""SELECT * from positions_table
+            WHERE championship=$championship and
+            stage=$stage and `group`=$group
+        """)
 
-        return select(
-            (
-                team,
-                count(team),
-                count(team),
-                count(team),
-                count(team),
-                count(team),
-                count(team)
+        championship = self.championship
+        pwinner = championship.points_winner
+        ploser = championship.points_loser
+        pdraw = championship.points_draw
+        for r in result:
+            team, championship, stage, group, pg, pp, pe, gf, gc = r
+            yield (
+                Team[team],
+                pg, pe, pp,
+                gf, gc,
+                pg*pwinner + pp*ploser + pe*pdraw
             )
-            for m in Match
-            for tm in m.team_matches
-            for team in Team
-            if (m.stage == self and m.group == group and
-                tm.team.team == team)
-        )
 
     def get_teams_matches(self, group):
         if self.id == 0:

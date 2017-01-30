@@ -74,8 +74,6 @@
         </thead>
         <tbody>
           {% for team, pg, pe, pp, gf, gc, points in stage.get_table(group) %}
-          {% set pj = pg + pe + pp %}
-          {% set gd = gf - gc %}
           <tr>
             <td scope="row">
               {{ loop.index }}
@@ -86,7 +84,7 @@
               </a>
             </td>
             <td>
-              {{ pj }}
+              {{ pg + pp + pe }}
             </td>
             <td>
               {{ pg }}
@@ -104,7 +102,7 @@
               {{ gc }}
             </td>
             <td>
-              {{ gd }}
+              {{ gf - gc }}
             </td>
             <td>
               <strong>{{ points }}</strong>
