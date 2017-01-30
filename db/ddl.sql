@@ -172,3 +172,29 @@ group by
     d.stage,
     d.`group`;
 
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_position_table`(
+	IN championship_id varchar(10),
+    IN stage_id varchar(10),
+    IN group_id varchar(10))
+BEGIN
+	SELECT
+		@pwinner := points_winner,
+        @pdraw := points_draw,
+        @ploser := points_loser
+	FROM
+		championship
+	WHERE
+		id = championship_id;
+	
+	SELECT 
+		*
+	FROM
+		positions_table
+	WHERE
+		championship = championship_id AND
+		stage = stage_id AND `group` = group_id
+	ORDER BY
+		pg * @pwinner + pp * @ploser + pe * @pdraw DESC,
+		gf - gc DESC, gf DESC, gc ASC;
+END
