@@ -48,9 +48,11 @@
         <h4 class="modal-title">{{ title }}</h4>
       </div>
       <form id="{{ form_id }}">
+        {% if body %}
         <div class="modal-body">
           {{ body }}
         </div>
+        {% endif %}
         <div class="modal-footer">
           <button type="submit" class="btn btn-{{ action_type }}">
             {{ accept }}

@@ -5,6 +5,8 @@
 
 {% set championship = stage.championship %}
 {% set form_id = "form-choose-stage" %}
+{% set form_random = "form-random" %}
+{% set modal_random = "modal-random" %}
 
 {% block body %}
 <h1>
@@ -53,6 +55,11 @@
         Partidos
       </a>
     </li>
+    <div class="pull-right">
+      <a data-toggle="modal" href="#{{ modal_random }}" class="btn btn-success">
+        Marcadores Aleatorios
+      </a>
+    </div>
   </ul>
 
   <div class="tab-content">
@@ -241,6 +248,17 @@
 {% endblock %}
 
 
+{% block modals %}
+
+{{ macros.make_confirm_modal(
+  "¿Llenar partidos de manera aleatoria?",
+  modal_random,
+  form_random,
+  None)
+}}
+
+{% endblock %}
+
 {% block scripts %}
 <script>
   $(function() {
@@ -254,4 +272,17 @@
     });
   });
 </script>
+
+{{ macros.js_send_request(
+  form_random,
+  url_for(
+    'random_marker',
+    championship=championship.id,
+    stage=stage.id,
+    group=group
+  ),
+  "Marcadores actualizados",
+  modal_id=modal_random)
+}}
+
 {% endblock %}

@@ -130,6 +130,23 @@ class Match(db.Entity):
             if n_stage:
                 n_stage.create_matches()
 
+    def add_goals(self):
+        if self.state == 'finished':
+            return
+        self.state = 'started'
+        na = random.randint(0, 5)
+        nb = random.randint(0, 5)
+        while self.stage.draw and na == nb:
+            na = random.randint(0, 5)
+            nb = random.randint(0, 5)
+            
+        for tm, n in zip(self.team_matches, [na, nb]):
+            for _ in range(n):
+                tm.goals.create(
+                    player=tm.team.team.players.random(1)[:][0]
+                )
+        self.state = 'finished'
+
 
 class Goal(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
@@ -307,6 +324,11 @@ class Stage(db.Entity):
         ).order_by(
             lambda match: match.round
         )
+
+    def random_marker(self, group):
+        for m in self.matches:
+            if m.group == group:
+                m.add_goals()
 
     @property
     def is_finish(self):

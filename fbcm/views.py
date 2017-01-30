@@ -321,6 +321,26 @@ def finish_match(championship, stage, group, round, match):
     ))
 
 
+@app.route(
+    '/championship/<championship>/' +
+    'stage/<stage>/match/<int:group>/random/',
+    methods=['POST']
+)
+@db_session
+def random_marker(championship, stage, group):
+    stage = Stage.get(
+        id=stage,
+        championship=championship
+    )
+
+    stage.random_marker(group)
+
+    return redirect(url_for(
+        'stages',
+        championship_id=championship
+    ))
+
+
 @app.route('/championship/<championship>/top/')
 @db_session
 def top(championship):
