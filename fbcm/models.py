@@ -241,20 +241,39 @@ class Stage(db.Entity):
                 id=self.id - 1,
                 championship=self.championship
             )
-            return [
+            winners = [
                 TeamChampionship.get(
                     team=row[0],
                     championship=self.championship
                 )
                 for row in prev_stage.get_winners()
             ]
+            if self.algorithm == 'first-last':
+                n = len(winners)
+                if n//2 < group - 1:
+                    return []
+                else:
+                    first = winners[group - 1]
+                    if n//2 >= group:
+                        return [first, winners[n - group]]
+                    else:
+                        return [first]
+            elif self.algorithm == 'random':
+                # TODO
+                return []
 
     def get_winners(self):
-        for group in range(self.num_groups):
-            table = self.get_table(group)
-            [next(table) for _ in range(self.num_select)].sort(
-                lambda t: (t[6], t[4] - t[5], t[4], 9999 - t[5])
-            )
+        result = [
+            t
+            for group in range(1, self.num_groups + 1)
+            for i, t in enumerate(self.get_table(group))
+            if i < self.num_select
+        ]
+        
+        result.sort(
+            key=lambda t: (t[6], t[4] - t[5], t[4], 9999 - t[5])
+        )
+        return result
 
     def get_matches(self, group):
         return select(
@@ -267,9 +286,19 @@ class Stage(db.Entity):
     @property
     def is_finish(self):
         return all(
-            m.status == 'finished'
+            m.state == 'finished'
             for m in self.matches
         )
+
+    @property
+    def is_predictable(self):
+        stage = Stage.get(
+            id=self.id - 1,
+            championship=self.championship
+        )
+        if stage:
+            return not stage.is_finish
+        return False
 
 
 class TeamMatch(db.Entity):

@@ -157,6 +157,7 @@
           </tr>
         </thead>
         <tbody>
+        {% if not stage.is_predictable %}
           {% for match in stage.get_matches(group) %}
           {% set state = match.state %}
           {% if state == 'finished' %}
@@ -191,6 +192,31 @@
             </td>
           </tr>
           {% endfor %}
+        {% else %}
+          {% for group_, round, match, teams_ch in stage.pre_generate_matches(group) %}
+          <tr>
+            <td scope="row">
+              {{ loop.index }}
+            </td>
+            {% for team_ch in teams_ch %}
+            {% set team = team_ch.team %}
+            <td>
+              <a href="{{ url_for('team', id=team.id) }}">
+                {{ team.name }}
+              </a>
+              -
+              0
+            </td>
+            {% endfor %}
+            <td>
+              {{ round }}
+            </td>
+            <td>
+              -
+            </td>
+          </tr>
+          {% endfor %}
+        {% endif %}
         </tbody>
       </table>
 
