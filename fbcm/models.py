@@ -109,6 +109,13 @@ class Match(db.Entity):
             for team, goals in self.score
         )) == self.score.count()
 
+    def after_update(self):
+        stage = self.stage
+        if stage.is_finish:
+            n_stage = stage.next_stage
+            if n_stage:
+                n_stage.create_matches()
+
 
 class Goal(db.Entity):
     id = orm.PrimaryKey(int, auto=True)
@@ -269,7 +276,7 @@ class Stage(db.Entity):
             for i, t in enumerate(self.get_table(group))
             if i < self.num_select
         ]
-        
+
         result.sort(
             key=lambda t: (t[6], t[4] - t[5], t[4], 9999 - t[5])
         )
@@ -292,13 +299,24 @@ class Stage(db.Entity):
 
     @property
     def is_predictable(self):
-        stage = Stage.get(
-            id=self.id - 1,
-            championship=self.championship
-        )
+        stage = self.prev_stage
         if stage:
             return not stage.is_finish
         return False
+
+    @property
+    def prev_stage(self):
+        return Stage.get(
+            id=self.id - 1,
+            championship=self.championship
+        )
+
+    @property
+    def next_stage(self):
+        return Stage.get(
+            id=self.id + 1,
+            championship=self.championship
+        )
 
 
 class TeamMatch(db.Entity):
