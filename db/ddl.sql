@@ -115,6 +115,17 @@ where
 
 create or replace view `positions_table` as
 select
+    t.team,
+    t.championship,
+    t.stage,
+    t.`group`,
+    sum(t.pg) as pg,
+    sum(t.pp) as pp,
+    sum(t.pe) as pe,
+    sum(t.gf) as gf,
+    sum(t.gc) as gc
+from
+(select
     w.team,
     w.championship,
     w.stage,
@@ -186,7 +197,13 @@ group by
     d.team,
     d.championship,
     d.stage,
-    d.`group`;
+    d.`group`
+) as t
+group by
+    t.team,
+    t.championship,
+    t.stage,
+    t.`group`;
 
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_position_table`(
