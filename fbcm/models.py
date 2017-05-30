@@ -139,7 +139,7 @@ class Match(db.Entity):
         while self.stage.draw and na == nb:
             na = random.randint(0, 5)
             nb = random.randint(0, 5)
-            
+
         for tm, n in zip(self.team_matches, [na, nb]):
             for _ in range(n):
                 tm.goals.create(
@@ -299,7 +299,7 @@ class Stage(db.Entity):
                         return [first]
             elif self.algorithm == 'random':
                 random.Random(4).shuffle(winners)
-                n = 2  # len(winners)//self.num_groups
+                n = len(winners)//self.num_groups
                 l = (group - 1) * n
                 r = (l + n)
                 return winners[l:r]
